@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - CDGS School Core</title>
+  <meta name="description" content="Ringkasan pengelolaan CDGS School Core.">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-page">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a href="/pages/dashboard.html" class="sidebar-brand" aria-label="CDGS School Core, dashboard">
+        <span class="sidebar-brand-name">CDGS</span>
+        <span class="sidebar-brand-copy">School Core<small>Platform Admin</small></span>
+      </a>
+      <p class="sidebar-caption">Ruang kerja</p>
+      <nav class="sidebar-links" aria-label="Navigasi utama">
+        <a href="/pages/dashboard.html" class="side-link active" aria-current="page">Dashboard</a>
+        <a href="#tenant-section" class="side-link admin-nav-link" hidden>Tenant</a>
+        <span class="side-link side-link-disabled" aria-disabled="true">Find Talent <small>Segera hadir</small></span>
+        <span class="side-link side-link-disabled" aria-disabled="true">Undangan <small>Segera hadir</small></span>
+      </nav>
+      <div class="sidebar-foot">
+        <span class="sidebar-foot-label">Platform sekolah</span>
+        <span>CDGS School Core</span>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="top-bar">
+        <div class="topbar-heading">
+          <p class="topbar-context">CDGS School Core <span>/</span> Workspace</p>
+          <p class="topbar-title">Dashboard</p>
+        </div>
+        <label class="topbar-search">
+          <span class="search-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Cari tenant</span>
+          <input id="tenant-search" type="search" placeholder="Cari tenant, domain, atau ID..." autocomplete="off">
+        </label>
+        <div class="top-bar-actions">
+          <div class="account-chip" aria-label="Akun yang sedang masuk">
+            <span class="account-chip-text">
+              <span id="account-email-short">Memuat akun</span>
+              <span id="account-role-short">Memuat peran</span>
+            </span>
+          </div>
+          <button id="logout-btn" class="btn-logout" type="button">Keluar</button>
+        </div>
+      </header>
+
+      <main class="page-body" id="main-content" aria-label="Konten utama">
+        <div class="dashboard-loading" role="status" aria-live="polite">
+          <span class="loading-mark" aria-hidden="true"></span>
+          <span>Memuat dashboard...</span>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/dashboard.js"></script>
+  <script>
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      window.auth.logout();
+    });
+  </script>
+</body>
+</html>

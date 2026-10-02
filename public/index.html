@@ -3,128 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CDGS School Core - Login</title>
-  <!-- Tailwind CSS untuk tampilan rapi -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Masuk - CDGS School Core</title>
+  <meta name="description" content="Masuk ke platform talent siswa CDGS School Core.">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
-<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+<body class="login-page">
+  <div class="login-wrap">
+    <main class="login-card" id="login-card">
+      <section class="login-form-panel" aria-labelledby="login-title">
+        <p class="login-brand">CDGS <span>School Core</span></p>
+        <h1 id="login-title">Selamat datang kembali</h1>
+        <p class="login-intro">Masuk ke ruang kerja sekolah Anda.</p>
 
-  <!-- FORM LOGIN -->
-  <div id="login-card" class="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
-    <h2 class="text-2xl font-bold text-center text-slate-800 mb-6">CDGS School Core</h2>
-    <form id="login-form" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-slate-700">Email</label>
-        <input type="email" id="email" required class="w-full mt-1 p-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700">Password</label>
-        <input type="password" id="password" required class="w-full mt-1 p-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none">
-      </div>
-      <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-md transition">
-        Login
-      </button>
-    </form>
-    <p id="error-message" class="text-red-500 text-sm mt-4 text-center hidden"></p>
+        <form id="login-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="email">Email</label>
+            <input
+              class="form-input"
+              type="email"
+              id="email"
+              name="email"
+              autocomplete="username"
+              required
+              aria-required="true"
+            >
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="password">Kata sandi</label>
+            <input
+              class="form-input"
+              type="password"
+              id="password"
+              name="password"
+              autocomplete="current-password"
+              required
+              aria-required="true"
+            >
+          </div>
+          <button type="submit" class="btn-primary" id="login-btn">Masuk</button>
+          <p class="error-msg" id="error-message" role="alert" aria-live="assertive"></p>
+        </form>
+      </section>
+
+    </main>
   </div>
 
-  <!-- DASHBOARD / PROFIL (Tampil setelah login) -->
-  <div id="dashboard-card" class="bg-white p-8 rounded-xl shadow-md w-full max-w-lg hidden">
-    <h2 class="text-2xl font-bold text-slate-800 mb-2">Selamat Datang!</h2>
-    <p class="text-slate-600 mb-6">Anda berhasil terautentikasi via JWT.</p>
-
-    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-2 mb-6">
-      <p><strong>Email:</strong> <span id="user-email">...</span></p>
-
-      <p><strong>Role:</strong> <span id="user-role" class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-semibold">...</span></p>
-    </div>
-
-    <button id="logout-btn" class="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 rounded-md transition">
-      Logout
-    </button>
-  </div>
-
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
   <script>
-    const API_URL = 'http://localhost:3000/api/v1/auth';
+    // Jika token sudah ada dan valid, langsung ke dashboard.
+    (async function checkExistingSession() {
+      const token = window.auth.getToken();
+      if (!token) return;
 
-    const loginForm = document.getElementById('login-form');
-    const loginCard = document.getElementById('login-card');
-    const dashboardCard = document.getElementById('dashboard-card');
-    const errorMsg = document.getElementById('error-message');
-
-    // 1. Cek apakah pengguna sudah punya Token JWT di browser
-    window.addEventListener('DOMContentLoaded', () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        fetchUserProfile(token);
+      try {
+        const res = await window.api.fetch('/auth/me');
+        if (res.ok) {
+          window.location.href = '/pages/dashboard.html';
+        }
+      } catch (_) {
+        window.auth.clearToken();
       }
-    });
+    })();
 
-    // 2. Fungsi Kirim Login ke API
-    loginForm.addEventListener('submit', async (e) => {
+    const form   = document.getElementById('login-form');
+    const errMsg = document.getElementById('error-message');
+    const btn    = document.getElementById('login-btn');
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      errorMsg.classList.add('hidden');
+      errMsg.classList.remove('visible');
+      btn.disabled = true;
+      btn.textContent = 'Memproses...';
 
-      const email = document.getElementById('email').value;
+      const email    = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
 
-      try {
-        const res = await fetch(`${API_URL}/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.message || 'Login gagal!');
-        }
-
-        // Simpan token ke localStorage browser
-        localStorage.setItem('token', data.token);
-        
-        // Ambil data profil (/me)
-        fetchUserProfile(data.token);
-
-      } catch (err) {
-        errorMsg.textContent = err.message;
-        errorMsg.classList.remove('hidden');
+      if (!email || !password) {
+        errMsg.textContent = 'Email dan kata sandi wajib diisi.';
+        errMsg.classList.add('visible');
+        btn.disabled = false;
+        btn.textContent = 'Masuk';
+        return;
       }
-    });
 
-    // 3. Fungsi Memanggil Endpoint GET /me
-    async function fetchUserProfile(token) {
       try {
-        const res = await fetch(`${API_URL}/me`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) throw new Error('Sesi berakhir');
-
-        // Tampilkan data ke HTML
-        document.getElementById('user-email').textContent = data.user.email || data.user.user?.email || '-';
-        document.getElementById('user-role').textContent = data.user.role || data.user.user?.role || 'User';
-
-        loginCard.classList.add('hidden');
-        dashboardCard.classList.remove('hidden');
-
+        await window.auth.login(email, password);
+        window.location.href = '/pages/dashboard.html';
       } catch (err) {
-        localStorage.removeItem('token');
-        loginCard.classList.remove('hidden');
-        dashboardCard.classList.add('hidden');
+        errMsg.textContent = err.message;
+        errMsg.classList.add('visible');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Masuk';
       }
-    }
-
-    // 4. Tombol Logout
-    document.getElementById('logout-btn').addEventListener('click', () => {
-      localStorage.removeItem('token');
-      location.reload();
     });
   </script>
 </body>

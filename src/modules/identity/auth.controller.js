@@ -64,9 +64,26 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ error: 'Email atau password salah' });
     }
 
-    // Buat JWT Token (Sesuai JWT_SECRET di file .env)
+    // Ambil role dari user_roles -> roles
+    const roleResult = await db.query(
+      `SELECT r.name
+       FROM user_roles ur
+       JOIN roles r ON r.id = ur.role_id
+       WHERE ur.user_id = $1
+       ORDER BY r.name
+       LIMIT 1`,
+      [user.id]
+    );
+    const role = roleResult.rows.length > 0 ? roleResult.rows[0].name : null;
+
     const token = jwt.sign(
-      { id: user.id, tenant_id: user.tenant_id, school_id: user.school_id },
+      {
+        id: user.id,
+        email: user.email,
+        tenant_id: user.tenant_id,
+        school_id: user.school_id,
+        role
+      },
       process.env.JWT_SECRET || 'super_secret_jwt_key_cdgs',
       { expiresIn: '1d' }
     );
@@ -78,7 +95,8 @@ const loginUser = async (req, res) => {
         id: user.id,
         email: user.email,
         tenant_id: user.tenant_id,
-        school_id: user.school_id
+        school_id: user.school_id,
+        role
       }
     });
   } catch (error) {
@@ -106,4 +124,4 @@ module.exports = {
   registerUser,
   loginUser,
   getMe
-};
+}
