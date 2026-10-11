@@ -8,6 +8,7 @@ const tenantRoutes = require('./modules/tenant/tenant.routes');
 const authRoutes = require('./modules/identity/auth.routes');
 const dashboardRoutes = require('./modules/dashboard/dashboard.routes');
 const partnerRoutes = require('./modules/partners/partner.routes');
+const schoolRouter = require('./routes/school.router');
 
 const app = express();
 
@@ -19,7 +20,8 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use('/api/v1/tenants', tenantRoutes);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
-app.use('/api/v1/partners', partnerRoutes); 
+app.use('/api/v1/partners', partnerRoutes);
+app.use('/api/v1/schools', schoolRouter);
 
 app.get('/health', async (req, res) => {
   try {
