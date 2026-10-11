@@ -49,15 +49,183 @@
         </div>
       </header>
 
-      <main class="page-body" id="main-content" aria-label="Konten utama">
-        <div class="dashboard-loading" role="status" aria-live="polite">
-          <span class="loading-mark" aria-hidden="true"></span>
-          <span>Memuat dashboard...</span>
+      <main class="page-body" id="main-content" aria-label="Konten utama" style="padding: 24px; overflow-y: auto; max-height: calc(100vh - 70px);">
+
+        <!-- 1. Baris 5 Kartu Statistik Utama -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+          <div style="background: #1f2937; border: 1px solid #374151; padding: 16px; border-radius: 8px;">
+            <p style="color: #9ca3af; font-size: 11px; font-weight: 600; margin: 0 0 8px 0;">TENANT TERDAFTAR</p>
+            <h3 id="stat-total-tenants" style="font-size: 26px; font-weight: 700; margin: 0 0 4px 0; color: #f3f4f6;">2</h3>
+            <p style="color: #6b7280; font-size: 12px; margin: 0;">Data tenant di CDGS</p>
+          </div>
+
+          <div style="background: #1f2937; border: 1px solid #374151; padding: 16px; border-radius: 8px;">
+            <p style="color: #9ca3af; font-size: 11px; font-weight: 600; margin: 0 0 8px 0;">DOMAIN TERCATAT</p>
+            <h3 id="stat-domain-registered" style="font-size: 26px; font-weight: 700; margin: 0 0 4px 0; color: #f3f4f6;">2</h3>
+            <p style="color: #6b7280; font-size: 12px; margin: 0;">Tenant dengan domain</p>
+          </div>
+
+          <div style="background: #1f2937; border: 1px solid #374151; padding: 16px; border-radius: 8px;">
+            <p style="color: #9ca3af; font-size: 11px; font-weight: 600; margin: 0 0 8px 0;">DOMAIN BELUM DIISI</p>
+            <h3 id="stat-domain-empty" style="font-size: 26px; font-weight: 700; margin: 0 0 4px 0; color: #f3f4f6;">0</h3>
+            <p style="color: #6b7280; font-size: 12px; margin: 0;">Perlu dilengkapi pada data tenant</p>
+          </div>
+
+          <div style="background: #1f2937; border: 1px solid #374151; padding: 16px; border-radius: 8px;">
+            <p style="color: #9ca3af; font-size: 11px; font-weight: 600; margin: 0 0 8px 0;">PERAN AKUN</p>
+            <h3 id="stat-user-role" style="font-size: 18px; font-weight: 700; margin: 4px 0 4px 0; color: #f3f4f6;">Platform Admin</h3>
+            <p style="color: #6b7280; font-size: 12px; margin: 0;">Hak akses saat ini</p>
+          </div>
+
+          <div style="background: #1f2937; border: 1px solid #374151; padding: 16px; border-radius: 8px;">
+            <p style="color: #9ca3af; font-size: 11px; font-weight: 600; margin: 0 0 8px 0;">CAKUPAN AKUN</p>
+            <h3 id="stat-user-scope" style="font-size: 18px; font-weight: 700; margin: 4px 0 4px 0; color: #f3f4f6;">Platform</h3>
+            <p style="color: #6b7280; font-size: 12px; margin: 0;">Administrasi lintas tenant</p>
+          </div>
         </div>
-      </main>
+
+        <!-- 2. Section Tengah: Chart Domain & Panel Akun Aktif -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px;">
+          <!-- Grafik domain -->
+          <div style="background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 20px;">
+            <h4 style="margin: 0 0 4px 0; color: #f3f4f6; font-size: 16px;">Kelengkapan domain tenant</h4>
+            <p style="margin: 0 0 16px 0; color: #9ca3af; font-size: 13px;">Status berdasarkan data tenant yang terdaftar.</p>
+            <div style="position: relative; height: 200px; width: 100%;">
+              <canvas id="tenantDomainChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Panel Akun Aktif -->
+          <div style="background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 20px;">
+            <p style="color: #8b5cf6; font-size: 11px; font-weight: 700; margin: 0 0 4px 0; text-transform: uppercase;">ADMIN PLATFORM</p>
+            <h4 style="margin: 0 0 16px 0; color: #f3f4f6; font-size: 16px;">Akun aktif</h4>
+            <div style="font-size: 13px; color: #d1d5db; display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; justify-content: space-between;"><span style="color: #9ca3af;">Email</span> <span style="font-weight: 600; color: #fff;">admin@devr.sch.id</span></div>
+              <div style="display: flex; justify-content: space-between; border-top: 1px solid #374151; padding-top: 8px;"><span style="color: #9ca3af;">Peran</span> <span>Platform Admin</span></div>
+              <div style="display: flex; justify-content: space-between; border-top: 1px solid #374151; padding-top: 8px;"><span style="color: #9ca3af;">Tenant ID</span> <span style="font-family: monospace; font-size: 11px; color: #9ca3af;">4eb88c5b-5b42-4c31-b16f-17dd38bc0ace</span></div>
+              <div style="display: flex; justify-content: space-between; border-top: 1px solid #374151; padding-top: 8px;"><span style="color: #9ca3af;">School ID</span> <span style="font-family: monospace; font-size: 11px; color: #9ca3af;">fc64c2c0-f2e8-4b42-b40f-4d47b80c57a7</span></div>
+            </div>
+            <p style="margin-top: 16px; color: #6b7280; font-size: 11px; margin-bottom: 0;">Informasi mengikuti akun yang sedang masuk.</p>
+          </div>
+        </div>
+
+        <!-- 3. Tab Navigasi & Tabel Data Tenant -->
+        <div style="margin-bottom: 32px;">
+          <div style="display: flex; gap: 20px; border-bottom: 1px solid #374151; margin-bottom: 16px; padding-bottom: 8px;">
+            <span style="color: #8b5cf6; font-weight: 600; border-bottom: 2px solid #8b5cf6; padding-bottom: 8px; cursor: pointer;">Daftar tenant</span>
+            <span style="color: #9ca3af; cursor: pointer;">Status domain</span>
+            <span style="color: #9ca3af; cursor: pointer;">Akun aktif</span>
+          </div>
+
+          <div style="background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div>
+                <p style="color: #8b5cf6; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">DATA PLATFORM</p>
+                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Tenant terdaftar</h4>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <button style="background: #8b5cf6; color: white; border: none; padding: 6px 14px; border-radius: 16px; font-size: 12px; cursor: pointer;">Semua</button>
+                <button style="background: #374151; color: #9ca3af; border: none; padding: 6px 14px; border-radius: 16px; font-size: 12px; cursor: pointer;">Ada domain</button>
+                <button style="background: #374151; color: #9ca3af; border: none; padding: 6px 14px; border-radius: 16px; font-size: 12px; cursor: pointer;">Belum ada</button>
+                <select style="background: #374151; color: white; border: 1px solid #4b5563; padding: 6px 12px; border-radius: 6px; font-size: 12px; margin-left: 8px;">
+                  <option>Terbaru</option>
+                </select>
+              </div>
+            </div>
+
+            <table style="width: 100%; border-collapse: collapse; color: #f3f4f6; text-align: left; font-size: 14px;">
+              <thead>
+                <tr style="border-bottom: 1px solid #374151; color: #9ca3af; font-size: 12px;">
+                  <th style="padding: 12px 10px;">NAMA TENANT</th>
+                  <th style="padding: 12px 10px;">DOMAIN</th>
+                  <th style="padding: 12px 10px;">TANGGAL DIBUAT</th>
+                </tr>
+              </thead>
+              <tbody id="tenant-table-body">
+                <tr style="border-bottom: 1px solid #374151;">
+                  <td style="padding: 12px 10px; font-weight: 600;">DEV1</td>
+                  <td style="padding: 12px 10px; color: #d1d5db;">dev-1.id</td>
+                  <td style="padding: 12px 10px; color: #d1d5db;">25 Sep 2026</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #374151;">
+                  <td style="padding: 12px 10px; font-weight: 600;">MAN 1</td>
+                  <td style="padding: 12px 10px; color: #d1d5db;">man-1.cdgs.id</td>
+                  <td style="padding: 12px 10px; color: #d1d5db;">25 Sep 2026</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 4. Modul Tambahan: Mitra DUDI & PTN -->
+        <div style="margin-top: 32px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0; color: #f3f4f6; font-size: 18px;">Daftar Mitra DUDI & PTN</h3>
+            <button id="btn-add-partner" onclick="openPartnerModal()" style="background: #8b5cf6; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px;">+ Tambah Mitra</button>
+          </div>
+
+          <div style="background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 16px; overflow-x: auto; margin-bottom: 40px;">
+            <table style="width: 100%; border-collapse: collapse; color: #f3f4f6; text-align: left; font-size: 14px;">
+              <thead>
+                <tr style="border-bottom: 1px solid #374151; color: #9ca3af;">
+                  <th style="padding: 12px 10px;">Nama Instansi</th>
+                  <th style="padding: 12px 10px;">Kategori</th>
+                  <th style="padding: 12px 10px;">Kontak (CP)</th>
+                  <th style="padding: 12px 10px;">Telepon</th>
+                  <th style="padding: 12px 10px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="partner-table-body">
+                <tr>
+                  <td colspan="5" style="text-align: center; padding: 20px; color: #9ca3af;">Memuat data mitra...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Modal Form Tambah Mitra -->
+        <div id="partner-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000;">
+          <div style="background: #1f2937; border: 1px solid #374151; padding: 24px; border-radius: 8px; width: 400px; color: #fff;">
+            <h4 style="margin-top: 0; margin-bottom: 16px; font-size: 18px;">Tambah Mitra Baru</h4>
+            <form id="partner-form">
+              <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">Nama Instansi / Perusahaan</label>
+                <input type="text" id="partner-name" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff; box-sizing: border-box;">
+              </div>
+              <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">Kategori</label>
+                <select id="partner-category" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff; box-sizing: border-box;">
+                  <option value="DUDI">DUDI (Dunia Usaha / Industri)</option>
+                  <option value="PTN">PTN (Perguruan Tinggi)</option>
+                </select>
+              </div>
+              <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">Contact Person (CP)</label>
+                <input type="text" id="partner-cp" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff; box-sizing: border-box;">
+              </div>
+              <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">No. Telepon / WA</label>
+                <input type="text" id="partner-phone" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff; box-sizing: border-box;">
+              </div>
+              <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">Alamat Instansi</label>
+                <textarea id="partner-address" rows="2" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff; box-sizing: border-box; resize: vertical;"></textarea>
+              </div>
+              <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button type="button" onclick="closePartnerModal()" style="padding: 8px 16px; background: #4b5563; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Batal</button>
+                <button type="submit" style="padding: 8px 16px; background: #8b5cf6; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Simpan</button>
+              </div>
+              
+            </form>
+          </div>
+        </div>
+
+</main>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/auth.js"></script>
   <script src="/js/dashboard.js"></script>
@@ -66,5 +234,7 @@
       window.auth.logout();
     });
   </script>
+  
+
 </body>
 </html>
