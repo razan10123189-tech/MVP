@@ -369,143 +369,172 @@
             <div class="hero-content">
               <span class="eyebrow" style="color: #6EE7B7;"><i class="fa-solid fa-chalkboard-user"></i> RUANG KERJA GURU PEMBIMBING</span>
               <h2>Bimbingan Talenta & Verifikasi Portofolio</h2>
-              <p>Validasi pengajuan proyek dan kompetensi siswa binaan Anda, berikan masukan konstruktif, serta rekomendasikan siswa ke mitra DUDI.</p>
+              <p>Validasi pengajuan karya siswa binaan, sematkan lencana industri, pantau progres magang PKL di DUDI, serta kelola jurnal bimbingan talenta secara terpadu.</p>
             </div>
-            <div class="hero-actions">
-              <button onclick="scrollToReviewQueue()" class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 13px; background: #059669;"><i class="fa-solid fa-check-double"></i> Review Antrean (3)</button>
+            <div class="hero-actions" style="flex-wrap: wrap;">
+              <button onclick="openAddGuidanceModal()" class="btn-primary" style="width: auto; padding: 7px 14px; font-size: 12px; background: #059669;"><i class="fa-solid fa-plus"></i> Catat Bimbingan</button>
+              <button onclick="openAddPKLModal()" class="btn-primary" style="width: auto; padding: 7px 14px; font-size: 12px; background: #2563eb;"><i class="fa-solid fa-briefcase"></i> Penempatan PKL</button>
+              <button onclick="openAddStudentModal()" class="btn-secondary" style="width: auto; padding: 7px 14px; font-size: 12px; border-color: #065F46; color: #6EE7B7; background: #092B24;"><i class="fa-solid fa-user-plus"></i> Tambah Siswa</button>
+              <button onclick="openGuruReportModal()" class="btn-secondary" style="width: auto; padding: 7px 14px; font-size: 12px; border-color: #374151; color: #f3f4f6;"><i class="fa-solid fa-print"></i> Rekap Laporan</button>
             </div>
           </div>
 
-          <!-- 4 Stat Cards Guru -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px;">
-            <div class="summary-card">
-              <p class="summary-label">SISWA BIMBINGAN</p>
-              <h3 class="summary-value" style="color: #34D399;">36</h3>
-              <p class="summary-caption">Siswa aktif dalam binaan</p>
+          <!-- 5 Stat Cards Guru -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 24px;">
+            <div class="summary-card" style="cursor: pointer;" onclick="switchGuruTab('students')">
+              <p class="summary-label">SISWA BINAAN</p>
+              <h3 id="stat-guru-students" class="summary-value" style="color: #34D399;">4</h3>
+              <p class="summary-caption">Siswa dalam bimbingan</p>
             </div>
-            <div class="summary-card" style="border-color: #065F46;">
+            <div class="summary-card" style="border-color: #065F46; cursor: pointer;" onclick="switchGuruTab('portfolios')">
               <p class="summary-label">MENUNGGU VALIDASI</p>
               <h3 id="stat-guru-pending" class="summary-value" style="color: #FCD34D;">3</h3>
               <p class="summary-caption">Portofolio butuh verifikasi</p>
             </div>
-            <div class="summary-card">
+            <div class="summary-card" style="cursor: pointer;" onclick="switchGuruTab('pkl')">
               <p class="summary-label">SISWA SEDANG PKL</p>
-              <h3 class="summary-value" style="color: #60A5FA;">14</h3>
-              <p class="summary-caption">Di 6 Mitra Industri</p>
+              <h3 id="stat-guru-pkl" class="summary-value" style="color: #60A5FA;">3</h3>
+              <p class="summary-caption">Di mitra industri aktif</p>
             </div>
-            <div class="summary-card">
+            <div class="summary-card" style="cursor: pointer;" onclick="switchGuruTab('portfolios')">
               <p class="summary-label">PORTOFOLIO TERVALIDASI</p>
-              <h3 id="stat-guru-verified" class="summary-value" style="color: #A78BFA;">58</h3>
-              <p class="summary-caption">Siap ditinjau industri</p>
+              <h3 id="stat-guru-verified" class="summary-value" style="color: #A78BFA;">2</h3>
+              <p class="summary-caption">Disetujui berstandar DUDI</p>
+            </div>
+            <div class="summary-card" style="cursor: pointer;" onclick="switchGuruTab('jurnal')">
+              <p class="summary-label">SESI BIMBINGAN</p>
+              <h3 id="stat-guru-guidance" class="summary-value" style="color: #F472B6;">3</h3>
+              <p class="summary-caption">Catatan sesi konsultasi</p>
             </div>
           </div>
 
-          <!-- Antrean Validasi Portofolio Siswa -->
-          <div id="section-review-queue" class="panel" style="margin-bottom: 24px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <!-- Sub-Tab Navigation Guru -->
+          <div class="nav-pills" id="guru-nav-pills" style="margin-bottom: 20px;">
+            <button class="nav-pill active" id="btn-guru-tab-portfolios" onclick="switchGuruTab('portfolios', this)">
+              <i class="fa-solid fa-check-double"></i> Antrean Validasi 
+              <span id="guru-pending-tab-badge" class="portfolio-badge-pending" style="font-size: 10px; padding: 1px 6px; margin-left: 6px;">3</span>
+            </button>
+            <button class="nav-pill" id="btn-guru-tab-students" onclick="switchGuruTab('students', this)">
+              <i class="fa-solid fa-users"></i> Siswa Bimbingan & Skill
+            </button>
+            <button class="nav-pill" id="btn-guru-tab-pkl" onclick="switchGuruTab('pkl', this)">
+              <i class="fa-solid fa-briefcase"></i> Monitoring PKL Industri
+            </button>
+            <button class="nav-pill" id="btn-guru-tab-jurnal" onclick="switchGuruTab('jurnal', this)">
+              <i class="fa-solid fa-book-journal-whills"></i> Jurnal Bimbingan
+            </button>
+          </div>
+
+          <!-- TAB 1: ANTREAN & RIWAYAT VALIDASI PORTOFOLIO -->
+          <div id="guru-tab-portfolios" class="guru-tab-content panel" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
               <div>
-                <p style="color: #10B981; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">BUTUH TINJAUAN GURU</p>
-                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Antrean Pengajuan Portofolio Siswa</h4>
+                <p style="color: #10B981; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">VERIFIKASI KOMPETENSI SISWA</p>
+                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Antrean Pengajuan Portofolio Proyek</h4>
               </div>
-              <span class="role-badge badge-guru">Prioritas Bimbingan</span>
+
+              <!-- Filter Status & Search -->
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <input type="text" id="guru-portfolio-search" placeholder="Cari karya / siswa / skill..." oninput="filterGuruPortfolios()" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #374151; background: #1f2937; color: #fff; width: 180px;">
+                <select id="guru-portfolio-status-filter" onchange="loadGuruPortfolios()" style="padding: 6px 10px; font-size: 12px; border-radius: 6px; border: 1px solid #374151; background: #1f2937; color: #fff;">
+                  <option value="ALL">Semua Status</option>
+                  <option value="PENDING" selected>⏳ Menunggu Validasi</option>
+                  <option value="APPROVED">✅ Telah Disetujui</option>
+                  <option value="REVISION">⚠️ Perlu Revisi</option>
+                </select>
+                <button onclick="loadGuruPortfolios()" class="btn-secondary" style="width: auto; padding: 6px 10px; font-size: 12px;" title="Muat Ulang"><i class="fa-solid fa-rotate-right"></i></button>
+              </div>
             </div>
 
+            <!-- List Portofolio Dinamis -->
             <div id="guru-queue-list">
-              <!-- Item 1 -->
-              <div class="review-item" id="review-item-1">
-                <div>
-                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                    <span style="font-weight: 600; color: #fff;">Muhammad Razan</span>
-                    <span style="font-size: 11px; color: #9ca3af;">• XII RPL 1</span>
-                    <span class="portfolio-badge-pending">⏳ Menunggu Validasi</span>
-                  </div>
-                  <h5 style="margin: 0 0 4px 0; color: #6EE7B7; font-size: 14px;">Aplikasi Fullstack Web Point-of-Sale CDGS</h5>
-                  <p style="margin: 0; color: #8F9DB4; font-size: 12px;">Teknologi: Node.js, Express, PostgreSQL, Vanilla CSS. Dilengkapi autentikasi JWT dan multi-tenant.</p>
-                </div>
-                <div style="display: flex; gap: 6px; flex-shrink: 0;">
-                  <button onclick="guruApprovePortfolio(1, 'Muhammad Razan', 'Aplikasi Fullstack Web Point-of-Sale')" class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 12px; background: #059669;"><i class="fa-solid fa-check"></i> Setujui & Beri Badge</button>
-                  <button onclick="guruRevisePortfolio(1, 'Muhammad Razan')" class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px; color: #FCD34D; border-color: #78350F; background: #2E1F08;"><i class="fa-solid fa-comment-dots"></i> Beri Catatan</button>
-                </div>
-              </div>
-
-              <!-- Item 2 -->
-              <div class="review-item" id="review-item-2">
-                <div>
-                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                    <span style="font-weight: 600; color: #fff;">Dewi Lestari</span>
-                    <span style="font-size: 11px; color: #9ca3af;">• XII DKV 2</span>
-                    <span class="portfolio-badge-pending">⏳ Menunggu Validasi</span>
-                  </div>
-                  <h5 style="margin: 0 0 4px 0; color: #6EE7B7; font-size: 14px;">Redesain Antarmuka Mobile Portal Magang Siswa</h5>
-                  <p style="margin: 0; color: #8F9DB4; font-size: 12px;">Prototype Figma interaktif 24 layar dengan panduan Design System & WCAG AA Accessibility.</p>
-                </div>
-                <div style="display: flex; gap: 6px; flex-shrink: 0;">
-                  <button onclick="guruApprovePortfolio(2, 'Dewi Lestari', 'Redesain Antarmuka Mobile Portal')" class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 12px; background: #059669;"><i class="fa-solid fa-check"></i> Setujui & Beri Badge</button>
-                  <button onclick="guruRevisePortfolio(2, 'Dewi Lestari')" class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px; color: #FCD34D; border-color: #78350F; background: #2E1F08;"><i class="fa-solid fa-comment-dots"></i> Beri Catatan</button>
-                </div>
-              </div>
-
-              <!-- Item 3 -->
-              <div class="review-item" id="review-item-3">
-                <div>
-                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                    <span style="font-weight: 600; color: #fff;">Farhan Maulana</span>
-                    <span style="font-size: 11px; color: #9ca3af;">• XI TKJ 2</span>
-                    <span class="portfolio-badge-pending">⏳ Menunggu Validasi</span>
-                  </div>
-                  <h5 style="margin: 0 0 4px 0; color: #6EE7B7; font-size: 14px;">Infrastruktur Server Linux & Firewall VPN</h5>
-                  <p style="margin: 0; color: #8F9DB4; font-size: 12px;">Konfigurasi Ubuntu Server dengan WireGuard VPN, Nginx Reverse Proxy, dan automated backup cron.</p>
-                </div>
-                <div style="display: flex; gap: 6px; flex-shrink: 0;">
-                  <button onclick="guruApprovePortfolio(3, 'Farhan Maulana', 'Infrastruktur Server Linux')" class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 12px; background: #059669;"><i class="fa-solid fa-check"></i> Setujui & Beri Badge</button>
-                  <button onclick="guruRevisePortfolio(3, 'Farhan Maulana')" class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px; color: #FCD34D; border-color: #78350F; background: #2E1F08;"><i class="fa-solid fa-comment-dots"></i> Beri Catatan</button>
-                </div>
+              <div style="text-align: center; padding: 30px; color: #9ca3af;">
+                <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 20px; margin-bottom: 8px;"></i>
+                <p style="margin: 0;">Memuat antrean portofolio siswa...</p>
               </div>
             </div>
           </div>
 
-          <!-- Tabel Siswa Bimbingan -->
-          <div class="panel">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <!-- TAB 2: DAFTAR SISWA BIMBINGAN & PEMETAAN SKILL -->
+          <div id="guru-tab-students" class="guru-tab-content panel" style="display: none; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
               <div>
-                <p style="color: #10B981; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">KELAS BINAAN</p>
-                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Daftar Siswa Bimbingan & Pemetaan Skill</h4>
+                <p style="color: #10B981; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">KELAS BINAAN & PEMETAAN TALENTA</p>
+                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Daftar Siswa Bimbingan Guru</h4>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="text" id="guru-student-search" placeholder="Cari nama / NISN / skill..." oninput="filterGuruStudents()" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #374151; background: #1f2937; color: #fff; width: 180px;">
+                <button onclick="openAddStudentModal()" class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 12px; background: #059669;"><i class="fa-solid fa-user-plus"></i> Tambah Siswa</button>
               </div>
             </div>
-            <table style="width: 100%; border-collapse: collapse; color: #f3f4f6; text-align: left; font-size: 13px;">
-              <thead>
-                <tr style="border-bottom: 1px solid #26334A; color: #9ca3af; font-size: 12px;">
-                  <th style="padding: 10px;">Nama Siswa</th>
-                  <th style="padding: 10px;">NISN</th>
-                  <th style="padding: 10px;">Keahlian Utama</th>
-                  <th style="padding: 10px;">Portofolio Disetujui</th>
-                  <th style="padding: 10px;">Status PKL / Industri</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style="border-bottom: 1px solid #1E293B;">
-                  <td style="padding: 10px; font-weight: 600;">Muhammad Razan</td>
-                  <td style="padding: 10px; color: #9ca3af;">0068492011</td>
-                  <td style="padding: 10px;"><span class="skill-tag">JavaScript</span> <span class="skill-tag">PostgreSQL</span></td>
-                  <td style="padding: 10px; color: #34D399;">4 Proyek</td>
-                  <td style="padding: 10px;"><span class="role-badge badge-guru">Siap Disalurkan</span></td>
-                </tr>
-                <tr style="border-bottom: 1px solid #1E293B;">
-                  <td style="padding: 10px; font-weight: 600;">Dewi Lestari</td>
-                  <td style="padding: 10px; color: #9ca3af;">0068492012</td>
-                  <td style="padding: 10px;"><span class="skill-tag">UI/UX</span> <span class="skill-tag">Figma</span></td>
-                  <td style="padding: 10px; color: #34D399;">3 Proyek</td>
-                  <td style="padding: 10px;"><span class="role-badge badge-kepsek">Magang di Studio Digital</span></td>
-                </tr>
-                <tr style="border-bottom: 1px solid #1E293B;">
-                  <td style="padding: 10px; font-weight: 600;">Farhan Maulana</td>
-                  <td style="padding: 10px; color: #9ca3af;">0068492013</td>
-                  <td style="padding: 10px;"><span class="skill-tag">Mikrotik</span> <span class="skill-tag">Linux</span></td>
-                  <td style="padding: 10px; color: #34D399;">2 Proyek</td>
-                  <td style="padding: 10px;"><span class="role-badge badge-admin">Sedang PKL (Telkom)</span></td>
-                </tr>
-              </tbody>
-            </table>
+
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; color: #f3f4f6; text-align: left; font-size: 13px;">
+                <thead>
+                  <tr style="border-bottom: 1px solid #26334A; color: #9ca3af; font-size: 12px;">
+                    <th style="padding: 10px;">Nama Siswa</th>
+                    <th style="padding: 10px;">NISN / Kelas</th>
+                    <th style="padding: 10px;">Keahlian Utama</th>
+                    <th style="padding: 10px;">Portofolio Disetujui</th>
+                    <th style="padding: 10px;">Status PKL</th>
+                    <th style="padding: 10px;">Rekomendasi Industri</th>
+                    <th style="padding: 10px; text-align: right;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="guru-students-table-body">
+                  <tr>
+                    <td colspan="7" style="text-align: center; padding: 24px; color: #9ca3af;">Memuat data siswa bimbingan...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TAB 3: MONITORING & EVALUASI PKL INDUSTRI -->
+          <div id="guru-tab-pkl" class="guru-tab-content panel" style="display: none; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+              <div>
+                <p style="color: #60A5FA; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">SUPERVISI PRAKTIK KERJA LAPANGAN</p>
+                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Monitoring Penempatan & Evaluasi Magang DUDI</h4>
+              </div>
+              <button onclick="openAddPKLModal()" class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 12px; background: #2563eb;"><i class="fa-solid fa-plus"></i> Tambah Penempatan PKL</button>
+            </div>
+
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; color: #f3f4f6; text-align: left; font-size: 13px;">
+                <thead>
+                  <tr style="border-bottom: 1px solid #26334A; color: #9ca3af; font-size: 12px;">
+                    <th style="padding: 10px;">Siswa & Kelas</th>
+                    <th style="padding: 10px;">Mitra Industri (DUDI)</th>
+                    <th style="padding: 10px;">Periode Magang</th>
+                    <th style="padding: 10px;">Kehadiran</th>
+                    <th style="padding: 10px;">Nilai & Evaluasi</th>
+                    <th style="padding: 10px;">Status</th>
+                    <th style="padding: 10px; text-align: right;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="guru-pkl-table-body">
+                  <tr>
+                    <td colspan="7" style="text-align: center; padding: 24px; color: #9ca3af;">Memuat data monitoring PKL...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TAB 4: JURNAL & CATATAN BIMBINGAN SISWA -->
+          <div id="guru-tab-jurnal" class="guru-tab-content panel" style="display: none; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+              <div>
+                <p style="color: #F472B6; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">LOG KONSULTASI & PENDAMPINGAN</p>
+                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Riwayat Sesi Bimbingan Talenta</h4>
+              </div>
+              <button onclick="openAddGuidanceModal()" class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 12px; background: #db2777;"><i class="fa-solid fa-plus"></i> Catat Sesi Bimbingan</button>
+            </div>
+
+            <div id="guru-guidance-list">
+              <div style="text-align: center; padding: 24px; color: #9ca3af;">Memuat catatan sesi bimbingan...</div>
+            </div>
           </div>
         </section>
 
@@ -1112,6 +1141,303 @@
           <button type="submit" class="btn-primary" style="width:auto; padding:6px 16px; background:#db2777;">Kirim Undangan</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL-MODAL KHUSUS GURU PEMBIMBING                                       -->
+  <!-- ========================================================================= -->
+
+  <!-- G1. Modal Validasi & Beri Nilai / Badge Portofolio -->
+  <div id="modalValidatePortfolio" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog" style="max-width: 520px;">
+      <div class="modal-head" style="border-bottom-color: #065F46;">
+        <h3 style="color: #6EE7B7;"><i class="fa-solid fa-award"></i> Validasi Portofolio & Beri Badge</h3>
+        <button type="button" class="modal-close-btn" onclick="closeValidateModal()">&times;</button>
+      </div>
+      <form id="validatePortfolioForm" onsubmit="handleApprovePortfolio(event)">
+        <div class="modal-body">
+          <input type="hidden" id="validate-portfolio-id">
+          <div style="background: #111A2B; border: 1px solid #26334A; border-radius: 6px; padding: 10px 12px; margin-bottom: 14px;">
+            <p style="margin: 0 0 2px 0; font-size: 11px; color: #8F9DB4;">Siswa Pengaju:</p>
+            <h4 id="validate-modal-student" style="margin: 0 0 4px 0; color: #fff; font-size: 14px;">-</h4>
+            <p id="validate-modal-title" style="margin: 0; color: #6EE7B7; font-size: 13px; font-weight: 500;">-</p>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Nilai Portofolio (0 - 100) *</label>
+              <input type="number" id="validate-portfolio-score" min="0" max="100" step="0.5" required value="92" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff; font-weight:600;">
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Lencana Keahlian (Badge) *</label>
+              <select id="validate-portfolio-badge" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+                <option value="⭐ Siap Industri">⭐ Siap Industri</option>
+                <option value="🏆 Mahir Fullstack">🏆 Mahir Fullstack</option>
+                <option value="🎨 UI/UX Expert">🎨 UI/UX Expert</option>
+                <option value="🔒 Sysadmin Ready">🔒 Sysadmin Ready</option>
+                <option value="📱 Mobile App Master">📱 Mobile App Master</option>
+                <option value="🚀 Talenta Inovatif">🚀 Talenta Inovatif</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Catatan Apresiasi & Evaluasi Guru *</label>
+            <textarea id="validate-portfolio-feedback" rows="3" required placeholder="Tuliskan masukan positif atau aspek mutu yang telah dipenuhi siswa..." style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">Arsitektur proyek rapi, menerapkan standar industri, dan dokumentasi lengkap.</textarea>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" onclick="closeValidateModal()" class="btn-secondary" style="width:auto; padding:6px 14px; border-color:#4b5563; color:#fff;">Batal</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:6px 18px; background:#059669;"><i class="fa-solid fa-check"></i> Setujui & Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- G2. Modal Instruksi Revisi Portofolio -->
+  <div id="modalRevisePortfolio" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog" style="max-width: 500px;">
+      <div class="modal-head" style="border-bottom-color: #78350F;">
+        <h3 style="color: #FCD34D;"><i class="fa-solid fa-comment-dots"></i> Beri Instruksi Revisi Portofolio</h3>
+        <button type="button" class="modal-close-btn" onclick="closeReviseModal()">&times;</button>
+      </div>
+      <form id="revisePortfolioForm" onsubmit="handleRevisePortfolio(event)">
+        <div class="modal-body">
+          <input type="hidden" id="revise-portfolio-id">
+          <div style="background: #111A2B; border: 1px solid #26334A; border-radius: 6px; padding: 10px 12px; margin-bottom: 14px;">
+            <p style="margin: 0 0 2px 0; font-size: 11px; color: #8F9DB4;">Siswa Pengaju:</p>
+            <h4 id="revise-modal-student" style="margin: 0 0 4px 0; color: #fff; font-size: 14px;">-</h4>
+            <p id="revise-modal-title" style="margin: 0; color: #FCD34D; font-size: 13px;">-</p>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#FCD34D;">Poin Perbaikan yang Diperlukan Siswa *</label>
+            <textarea id="revise-portfolio-feedback" rows="4" required placeholder="Contoh: Harap lengkapi file README, sertakan panduan instalasi, dan perbaiki tautan deployment live." style="width:100%; padding:8px; border-radius:4px; border:1px solid #78350F; background:#2E1F08; color:#fff;"></textarea>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Skor Sementara (Opsional)</label>
+            <input type="number" id="revise-portfolio-score" min="0" max="100" placeholder="Contoh: 70" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" onclick="closeReviseModal()" class="btn-secondary" style="width:auto; padding:6px 14px; border-color:#4b5563; color:#fff;">Batal</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:6px 18px; background:#d97706;"><i class="fa-solid fa-paper-plane"></i> Kirim Revisi ke Siswa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- G3. Modal Detail Portofolio Siswa -->
+  <div id="modalDetailPortfolio" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog" style="max-width: 620px;">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-folder-open"></i> Detail Portofolio Proyek Siswa</h3>
+        <button type="button" class="modal-close-btn" onclick="closeDetailModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="detail-portfolio-content">
+        <!-- Dynamic populated -->
+      </div>
+      <div class="modal-foot">
+        <button type="button" onclick="closeDetailModal()" class="btn-secondary" style="width:auto; padding:6px 16px;">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- G4. Modal Tambah Siswa Binaan Baru -->
+  <div id="modalAddStudent" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog" style="max-width: 520px;">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-user-plus"></i> Tambah Siswa ke Kelompok Bimbingan</h3>
+        <button type="button" class="modal-close-btn" onclick="closeAddStudentModal()">&times;</button>
+      </div>
+      <form onsubmit="handleAddMentoredStudent(event)">
+        <div class="modal-body">
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Nama Lengkap Siswa *</label>
+            <input type="text" id="add-student-name" required placeholder="Contoh: Ahmad Fauzan" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 12px;">
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Email Akun Siswa *</label>
+              <input type="email" id="add-student-email" required placeholder="fauzan@cdgs.local" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">NISN</label>
+              <input type="text" id="add-student-nisn" placeholder="006849xxxx" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 12px;">
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Kelas</label>
+              <input type="text" id="add-student-class" placeholder="XII RPL 1" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Konsentrasi Keahlian / Jurusan</label>
+              <input type="text" id="add-student-major" placeholder="Rekayasa Perangkat Lunak" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+            </div>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Keahlian Utama (Pisahkan koma)</label>
+            <input type="text" id="add-student-skills" placeholder="JavaScript, Node.js, SQL, Tailwind" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" onclick="closeAddStudentModal()" class="btn-secondary" style="width:auto; padding:6px 14px;">Batal</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:6px 16px; background:#059669;">Daftarkan Siswa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- G5. Modal Evaluasi & Penilaian PKL Siswa -->
+  <div id="modalEvaluatePKL" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog" style="max-width: 500px;">
+      <div class="modal-head" style="border-bottom-color: #2563eb;">
+        <h3 style="color: #60A5FA;"><i class="fa-solid fa-clipboard-check"></i> Evaluasi PKL Guru Pembimbing</h3>
+        <button type="button" class="modal-close-btn" onclick="closeEvaluatePKLModal()">&times;</button>
+      </div>
+      <form onsubmit="handleEvaluatePKL(event)">
+        <div class="modal-body">
+          <input type="hidden" id="eval-pkl-id">
+          <div style="background: #111A2B; border: 1px solid #26334A; border-radius: 6px; padding: 10px 12px; margin-bottom: 14px;">
+            <h4 id="eval-pkl-student-name" style="margin: 0 0 2px 0; color: #fff; font-size: 14px;">-</h4>
+            <p id="eval-pkl-partner-name" style="margin: 0; color: #60A5FA; font-size: 12px;">-</p>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Nilai Pembimbing (0-100) *</label>
+              <input type="number" id="eval-pkl-score" min="0" max="100" step="0.5" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Tingkat Kehadiran (%) *</label>
+              <input type="number" id="eval-pkl-attendance" min="0" max="100" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Status Praktik Kerja *</label>
+            <select id="eval-pkl-status" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+              <option value="Aktif">Aktif</option>
+              <option value="Selesai">Selesai</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Catatan Supervisi & Evaluasi Guru</label>
+            <textarea id="eval-pkl-notes" rows="3" placeholder="Uraikan catatan perkembangan kompetensi siswa selama penempatan di mitra..." style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;"></textarea>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" onclick="closeEvaluatePKLModal()" class="btn-secondary" style="width:auto; padding:6px 14px;">Batal</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:6px 16px; background:#2563eb;">Simpan Evaluasi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- G6. Modal Tambah Penempatan PKL Siswa -->
+  <div id="modalAddPKL" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog" style="max-width: 500px;">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-briefcase"></i> Tambah Penempatan PKL Siswa</h3>
+        <button type="button" class="modal-close-btn" onclick="closeAddPKLModal()">&times;</button>
+      </div>
+      <form onsubmit="handleCreatePKL(event)">
+        <div class="modal-body">
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Pilih Siswa *</label>
+            <select id="add-pkl-student" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+              <!-- Populated by JS -->
+            </select>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Pilih Mitra Industri (DUDI) *</label>
+            <select id="add-pkl-partner" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+              <!-- Populated by JS -->
+            </select>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 12px;">
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Tanggal Mulai *</label>
+              <input type="date" id="add-pkl-start" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Tanggal Selesai *</label>
+              <input type="date" id="add-pkl-end" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+            </div>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Catatan Penempatan Awal</label>
+            <textarea id="add-pkl-notes" rows="2" placeholder="Catatan posisi magang, divisi, atau instruksi kerja..." style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;"></textarea>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" onclick="closeAddPKLModal()" class="btn-secondary" style="width:auto; padding:6px 14px;">Batal</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:6px 16px; background:#2563eb;">Tempatkan Siswa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- G7. Modal Catat Sesi Bimbingan Baru -->
+  <div id="modalAddGuidance" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog" style="max-width: 520px;">
+      <div class="modal-head" style="border-bottom-color: #db2777;">
+        <h3 style="color: #F472B6;"><i class="fa-solid fa-pen-nib"></i> Catat Sesi Bimbingan Siswa</h3>
+        <button type="button" class="modal-close-btn" onclick="closeAddGuidanceModal()">&times;</button>
+      </div>
+      <form onsubmit="handleCreateGuidance(event)">
+        <div class="modal-body">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 12px;">
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Siswa Bimbingan *</label>
+              <select id="guidance-student-select" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+                <!-- Populated by JS -->
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Tanggal Konsultasi *</label>
+              <input type="date" id="guidance-date" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+            </div>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Topik Bimbingan *</label>
+            <input type="text" id="guidance-topic" required placeholder="Contoh: Evaluasi Portofolio Fullstack & Persiapan Wawancara" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Catatan & Pengamatan Guru *</label>
+            <textarea id="guidance-notes" rows="3" required placeholder="Uraikan hasil diskusi, kendala yang dihadapi siswa, dan progres belajar..." style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;"></textarea>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Rencana Tindak Lanjut (Action Plan)</label>
+            <textarea id="guidance-action-plan" rows="2" placeholder="Langkah konkret yang harus diselesaikan siswa sebelum sesi berikutnya..." style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;"></textarea>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" onclick="closeAddGuidanceModal()" class="btn-secondary" style="width:auto; padding:6px 14px;">Batal</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:6px 16px; background:#db2777;">Simpan Catatan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- G8. Modal Rekap Laporan Mutu Bimbingan Guru (Print Ready) -->
+  <div id="modalGuruReport" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog" style="max-width: 780px;">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-file-invoice"></i> Rekapitulasi Laporan Bimbingan Guru</h3>
+        <button type="button" class="modal-close-btn" onclick="closeGuruReportModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="guru-report-printable-area" style="background: #0D1525; border-radius: 6px; padding: 20px; color: #fff; max-height: 70vh; overflow-y: auto;">
+        <!-- Dynamic populated report preview -->
+      </div>
+      <div class="modal-foot">
+        <button type="button" onclick="closeGuruReportModal()" class="btn-secondary" style="width:auto; padding:6px 14px;">Tutup</button>
+        <button type="button" onclick="window.print()" class="btn-primary" style="width:auto; padding:6px 18px; background:#059669;"><i class="fa-solid fa-print"></i> Cetak / Simpan PDF</button>
+      </div>
     </div>
   </div>
 
