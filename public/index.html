@@ -43,6 +43,18 @@
           <button type="submit" class="btn-primary" id="login-btn">Masuk</button>
           <p class="error-msg" id="error-message" role="alert" aria-live="assertive"></p>
         </form>
+
+        <!-- Quick Demo Account Switcher -->
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1);">
+          <p style="font-size: 11px; font-weight: 600; color: #8F9DB4; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Pilih Akun Demo Cepat:</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <button type="button" class="btn-secondary demo-pill" onclick="fillDemo('admin@devr.sch.id', 'admin123')" style="min-height: 28px; padding: 4px 10px; font-size: 11px; border-color: #8B5CF6; color: #C4B5FD;">🟣 Admin</button>
+            <button type="button" class="btn-secondary demo-pill" onclick="fillDemo('kepsek@cdgs.local', 'kepsek123')" style="min-height: 28px; padding: 4px 10px; font-size: 11px; border-color: #3B82F6; color: #93C5FD;">🔵 Kepsek</button>
+            <button type="button" class="btn-secondary demo-pill" onclick="fillDemo('guru@cdgs.local', 'guru123')" style="min-height: 28px; padding: 4px 10px; font-size: 11px; border-color: #10B981; color: #6EE7B7;">🟢 Guru</button>
+            <button type="button" class="btn-secondary demo-pill" onclick="fillDemo('murid@cdgs.local', 'murid123')" style="min-height: 28px; padding: 4px 10px; font-size: 11px; border-color: #F59E0B; color: #FCD34D;">🟡 Murid</button>
+            <button type="button" class="btn-secondary demo-pill" onclick="fillDemo('instansi@cdgs.local', 'instansi123')" style="min-height: 28px; padding: 4px 10px; font-size: 11px; border-color: #EC4899; color: #F9A8D4;">🔴 Instansi</button>
+          </div>
+        </div>
       </section>
 
     </main>
@@ -65,6 +77,13 @@
         window.auth.clearToken();
       }
     })();
+
+    function fillDemo(email, pass) {
+      document.getElementById('email').value = email;
+      document.getElementById('password').value = pass;
+      document.getElementById('error-message').classList.remove('visible');
+      document.getElementById('login-btn').focus();
+    }
 
     const form   = document.getElementById('login-form');
     const errMsg = document.getElementById('error-message');

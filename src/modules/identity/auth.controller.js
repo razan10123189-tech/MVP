@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 // 1. Registrasi User Baru (Admin Sekolah, Guru, Siswa, dll)
 const registerUser = async (req, res) => {
-  const { tenant_id, school_id, email, password } = req.body;
+  const { tenant_id, school_id, email, password, role_name } = req.body;
 
   try {
     // Cek apakah email sudah terdaftar
@@ -28,13 +28,31 @@ const registerUser = async (req, res) => {
     );
     const user = userResult.rows[0];
 
+    // Assign role jika role_name diberikan
+    let assignedRole = null;
+    if (role_name) {
+      const roleResult = await db.query(
+        'SELECT id, name FROM roles WHERE name = $1',
+        [role_name]
+      );
+
+      if (roleResult.rows.length > 0) {
+        await db.query(
+          'INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)',
+          [user.id, roleResult.rows[0].id]
+        );
+        assignedRole = roleResult.rows[0].name;
+      }
+    }
+
     res.status(201).json({
       message: 'User berhasil didaftarkan',
       user: {
         id: user.id,
         email: user.email,
         tenant_id,
-        school_id
+        school_id,
+        role: assignedRole
       }
     });
   } catch (error) {

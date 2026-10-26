@@ -742,3 +742,394 @@ body {
 @media (max-width: 360px) {
   .login-form-panel { padding: 1.35rem; }
 }
+
+/* ==========================================================================
+   ROLE-BASED DASHBOARD EXTENSIONS (CDGS SCHOOL CORE)
+   ========================================================================== */
+
+/* Role Badges */
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+}
+.role-badge::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.badge-admin {
+  background: rgba(139, 92, 246, 0.18);
+  border-color: rgba(139, 92, 246, 0.45);
+  color: #C4B5FD;
+}
+.badge-admin::before { background: #A78BFA; }
+
+.badge-kepsek {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: rgba(59, 130, 246, 0.45);
+  color: #93C5FD;
+}
+.badge-kepsek::before { background: #60A5FA; }
+
+.badge-guru {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #6EE7B7;
+}
+.badge-guru::before { background: #34D399; }
+
+.badge-murid {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: rgba(245, 158, 11, 0.45);
+  color: #FCD34D;
+}
+.badge-murid::before { background: #FBBF24; }
+
+.badge-instansi {
+  background: rgba(236, 72, 153, 0.18);
+  border-color: rgba(236, 72, 153, 0.45);
+  color: #F9A8D4;
+}
+.badge-instansi::before { background: #F472B6; }
+
+/* Role Switcher in Top Bar */
+.role-switcher-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #111A2B;
+  border: 1px solid #26334A;
+  padding: 0.3rem 0.65rem;
+  border-radius: 8px;
+}
+.role-switcher-label {
+  font-size: 0.68rem;
+  color: #8B9BB4;
+  white-space: nowrap;
+}
+.role-switcher-select {
+  background: #0C1424;
+  border: 1px solid #34415A;
+  color: #F3F5FA;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  outline: none;
+}
+.role-switcher-select:focus {
+  border-color: #8B5CF6;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
+}
+
+/* Role Hero Banner */
+.role-hero-banner {
+  border-radius: 12px;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  border: 1px solid #26334A;
+  position: relative;
+  overflow: hidden;
+}
+.role-hero-banner::after {
+  content: "";
+  position: absolute;
+  right: -60px;
+  top: -60px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.18;
+}
+.hero-admin {
+  background: linear-gradient(135deg, #17153B 0%, #111A2B 100%);
+  border-color: #493D82;
+}
+.hero-admin::after { background: radial-gradient(circle, #8B5CF6 0%, transparent 70%); }
+
+.hero-kepsek {
+  background: linear-gradient(135deg, #0F2347 0%, #111A2B 100%);
+  border-color: #1E3A8A;
+}
+.hero-kepsek::after { background: radial-gradient(circle, #3B82F6 0%, transparent 70%); }
+
+.hero-guru {
+  background: linear-gradient(135deg, #092B24 0%, #111A2B 100%);
+  border-color: #065F46;
+}
+.hero-guru::after { background: radial-gradient(circle, #10B981 0%, transparent 70%); }
+
+.hero-murid {
+  background: linear-gradient(135deg, #2E1F08 0%, #111A2B 100%);
+  border-color: #78350F;
+}
+.hero-murid::after { background: radial-gradient(circle, #F59E0B 0%, transparent 70%); }
+
+.hero-instansi {
+  background: linear-gradient(135deg, #2D0F25 0%, #111A2B 100%);
+  border-color: #831843;
+}
+.hero-instansi::after { background: radial-gradient(circle, #EC4899 0%, transparent 70%); }
+
+.hero-content h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #F8FAFC;
+  margin: 0.35rem 0 0.25rem 0;
+}
+.hero-content p {
+  color: #94A3B8;
+  font-size: 0.82rem;
+  margin: 0;
+  max-width: 620px;
+  line-height: 1.5;
+}
+.hero-actions {
+  display: flex;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
+/* Talent & Student Cards (Murid & Instansi) */
+.talent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+.talent-card {
+  background: #111A2B;
+  border: 1px solid #26334A;
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.talent-card:hover {
+  transform: translateY(-2px);
+  border-color: #493D82;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.talent-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+.talent-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #fff;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.talent-info h4 {
+  margin: 0;
+  color: #F3F5FA;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.talent-info p {
+  margin: 0.15rem 0 0 0;
+  color: #8F9DB4;
+  font-size: 0.72rem;
+}
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.85rem 0;
+}
+.skill-tag {
+  background: #1A263D;
+  border: 1px solid #2B3D5E;
+  color: #C5D3E8;
+  font-size: 0.68rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.skill-tag-highlight {
+  background: rgba(139, 92, 246, 0.18);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #C4B5FD;
+}
+
+/* Portfolio Cards (Murid) */
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+.portfolio-card {
+  background: #111A2B;
+  border: 1px solid #26334A;
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+}
+.portfolio-card:hover {
+  border-color: #384C6E;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+}
+.portfolio-badge-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #6EE7B7;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+.portfolio-badge-pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  background: rgba(245, 158, 11, 0.16);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #FCD34D;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+/* Validation Queue Cards (Guru) */
+.review-item {
+  background: #111A2B;
+  border: 1px solid #26334A;
+  border-radius: 8px;
+  padding: 1.1rem;
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: border-color 0.2s;
+}
+.review-item:hover {
+  border-color: #384C6E;
+}
+
+/* General Custom Modal */
+.custom-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 13, 23, 0.82);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.custom-modal-backdrop.active {
+  display: flex;
+}
+.custom-modal-dialog {
+  background: #111A2B;
+  border: 1px solid #34415A;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 520px;
+  color: #F3F5FA;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  animation: modalPop 0.2s ease-out;
+}
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid #26334A;
+}
+.modal-head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #F3F5FA;
+}
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: #8F9DB4;
+  font-size: 1.3rem;
+  cursor: pointer;
+  line-height: 1;
+}
+.modal-close-btn:hover { color: #fff; }
+.modal-body {
+  padding: 1.4rem;
+}
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  padding: 1rem 1.4rem;
+  border-top: 1px solid #26334A;
+  background: #0C1424;
+}
+
+/* Tab Pill Switcher within views */
+.nav-pills {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid #26334A;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+}
+.nav-pill {
+  padding: 0.45rem 1rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #8F9DB4;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.nav-pill:hover {
+  color: #F3F5FA;
+  background: #18243A;
+}
+.nav-pill.active {
+  color: #fff;
+  background: #28234A;
+  border-color: #6D56D9;
+}
+

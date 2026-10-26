@@ -4,314 +4,1121 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - CDGS School Core</title>
-  <meta name="description" content="Ringkasan pengelolaan CDGS School Core.">
+  <meta name="description" content="Platform Manajemen Talenta Sekolah CDGS School Core.">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="dashboard-page">
   <div class="app-shell">
+    <!-- SIDEBAR -->
     <aside class="sidebar">
       <a href="/pages/dashboard.html" class="sidebar-brand" aria-label="CDGS School Core, dashboard">
         <span class="sidebar-brand-name">CDGS</span>
-        <span class="sidebar-brand-copy">School Core<small>Platform Admin</small></span>
+        <span class="sidebar-brand-copy">School Core<small id="sidebar-role-label">Platform Admin</small></span>
       </a>
-      <p class="sidebar-caption">Ruang kerja</p>
-      <nav class="sidebar-links" aria-label="Navigasi utama">
-        <a href="/pages/dashboard.html" class="side-link active" aria-current="page">Dashboard</a>
-        <a href="#tenant-section" class="side-link admin-nav-link" hidden>Tenant</a>
-        <span class="side-link side-link-disabled" aria-disabled="true">Find Talent <small>Segera hadir</small></span>
-        <span class="side-link side-link-disabled" aria-disabled="true">Undangan <small>Segera hadir</small></span>
+
+      <p class="sidebar-caption">Menu Ruang Kerja</p>
+      <nav class="sidebar-links" id="sidebar-nav-container" aria-label="Navigasi utama">
+        <!-- Rendered dynamically by dashboard.js based on active role -->
       </nav>
+
       <div class="sidebar-foot">
-        <span class="sidebar-foot-label">Platform sekolah</span>
-        <span>CDGS School Core</span>
+        <span class="sidebar-foot-label">Ekosistem Talenta Siswa</span>
+        <span>CDGS School Core &copy; 2026</span>
       </div>
     </aside>
 
+    <!-- WORKSPACE -->
     <div class="workspace">
+      <!-- TOP BAR -->
       <header class="top-bar">
         <div class="topbar-heading">
-          <p class="topbar-context">CDGS School Core <span>/</span> Workspace</p>
-          <p class="topbar-title">Dashboard</p>
+          <p class="topbar-context" id="topbar-breadcrumb">CDGS School Core <span>/</span> Ruang Kerja</p>
+          <p class="topbar-title" id="topbar-title-text">Dashboard</p>
         </div>
-        <label class="topbar-search">
-          <span class="search-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Cari tenant</span>
-          <input id="tenant-search" type="search" placeholder="Cari tenant, domain, atau ID..." autocomplete="off">
-        </label>
+
+        <!-- Role Previewer / Switcher -->
+        <div class="role-switcher-wrap" title="Ganti mode tampilan untuk menguji sudut pandang masing-masing role">
+          <span class="role-switcher-label"><i class="fa-solid fa-masks-theater"></i> Tampilan Role:</span>
+          <select id="role-switcher-select" class="role-switcher-select">
+            <option value="Platform Admin">🟣 Platform Admin</option>
+            <option value="Kepala Sekolah">🔵 Kepala Sekolah</option>
+            <option value="Guru">🟢 Guru</option>
+            <option value="Murid">🟡 Murid</option>
+            <option value="Instansi">🔴 Instansi (DUDI)</option>
+          </select>
+        </div>
+
         <div class="top-bar-actions">
           <div class="account-chip" aria-label="Akun yang sedang masuk">
             <span class="account-chip-text">
-              <span id="account-email-short">Memuat akun</span>
-              <span id="account-role-short">Memuat peran</span>
+              <span id="account-email-short">Memuat akun...</span>
+              <span id="account-role-badge" class="role-badge badge-admin">Memuat peran</span>
             </span>
           </div>
-          <button id="logout-btn" class="btn-logout" type="button">Keluar</button>
+          <button id="logout-btn" class="btn-logout" type="button"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
         </div>
       </header>
 
-      <main class="page-body" id="main-content" aria-label="Konten utama" style="padding: 24px; overflow-y: auto; max-height: calc(100vh - 70px);">
+      <!-- MAIN CONTENT -->
+      <main class="page-body" id="main-content" style="padding: 24px; overflow-y: auto; max-height: calc(100vh - 70px);">
 
-        <!-- 1. Baris 5 Kartu Statistik Utama -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
-          <div style="background: #1f2937; border: 1px solid #374151; padding: 16px; border-radius: 8px;">
-            <p style="color: #9ca3af; font-size: 11px; font-weight: 600; margin: 0 0 8px 0;">TENANT TERDAFTAR</p>
-            <h3 id="stat-total-tenants" style="font-size: 26px; font-weight: 700; margin: 0 0 4px 0; color: #f3f4f6;">2</h3>
-            <p style="color: #6b7280; font-size: 12px; margin: 0;">Data tenant di CDGS</p>
-          </div>
-
-          <div style="background: #1f2937; border: 1px solid #374151; padding: 16px; border-radius: 8px;">
-            <p style="color: #9ca3af; font-size: 11px; font-weight: 600; margin: 0 0 8px 0;">DOMAIN TERCATAT</p>
-            <h3 id="stat-domain-registered" style="font-size: 26px; font-weight: 700; margin: 0 0 4px 0; color: #f3f4f6;">2</h3>
-            <p style="color: #6b7280; font-size: 12px; margin: 0;">Tenant dengan domain</p>
-          </div>
-
-          <div style="background: #1f2937; border: 1px solid #374151; padding: 16px; border-radius: 8px;">
-            <p style="color: #9ca3af; font-size: 11px; font-weight: 600; margin: 0 0 8px 0;">DOMAIN BELUM DIISI</p>
-            <h3 id="stat-domain-empty" style="font-size: 26px; font-weight: 700; margin: 0 0 4px 0; color: #f3f4f6;">0</h3>
-            <p style="color: #6b7280; font-size: 12px; margin: 0;">Perlu dilengkapi pada data tenant</p>
-          </div>
-
-          <div style="background: #1f2937; border: 1px solid #374151; padding: 16px; border-radius: 8px;">
-            <p style="color: #9ca3af; font-size: 11px; font-weight: 600; margin: 0 0 8px 0;">PERAN AKUN</p>
-            <h3 id="stat-user-role" style="font-size: 18px; font-weight: 700; margin: 4px 0 4px 0; color: #f3f4f6;">Platform Admin</h3>
-            <p style="color: #6b7280; font-size: 12px; margin: 0;">Hak akses saat ini</p>
-          </div>
-
-          <div style="background: #1f2937; border: 1px solid #374151; padding: 16px; border-radius: 8px;">
-            <p style="color: #9ca3af; font-size: 11px; font-weight: 600; margin: 0 0 8px 0;">CAKUPAN AKUN</p>
-            <h3 id="stat-user-scope" style="font-size: 18px; font-weight: 700; margin: 4px 0 4px 0; color: #f3f4f6;">Platform</h3>
-            <p style="color: #6b7280; font-size: 12px; margin: 0;">Administrasi lintas tenant</p>
-          </div>
-        </div>
-
-        <!-- 2. Section Tengah: Chart Domain & Panel Akun Aktif -->
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px;">
-          <!-- Grafik domain -->
-          <div style="background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 20px;">
-            <h4 style="margin: 0 0 4px 0; color: #f3f4f6; font-size: 16px;">Kelengkapan domain tenant</h4>
-            <p style="margin: 0 0 16px 0; color: #9ca3af; font-size: 13px;">Status berdasarkan data tenant yang terdaftar.</p>
-            <div style="position: relative; height: 200px; width: 100%;">
-              <canvas id="tenantDomainChart"></canvas>
+        <!-- ================================================================= -->
+        <!-- VIEW 1: PLATFORM ADMIN (DEV-R)                                   -->
+        <!-- ================================================================= -->
+        <section id="view-role-admin" class="role-dashboard-view">
+          <!-- Hero Banner -->
+          <div class="role-hero-banner hero-admin">
+            <div class="hero-content">
+              <span class="eyebrow"><i class="fa-solid fa-server"></i> PLATFORM ADMINISTRATION</span>
+              <h2>Pusat Kendali Multi-Tenant & Data Platform</h2>
+              <p>Kelola data tenant sekolah, domain rujukan, master data sekolah terhubung, dan jejaring mitra DUDI & PTN secara terpusat.</p>
+            </div>
+            <div class="hero-actions">
+              <button onclick="openSchoolModal()" class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 13px;"><i class="fa-solid fa-plus"></i> Tambah Sekolah</button>
+              <button onclick="openPartnerModal()" class="btn-secondary" style="width: auto; padding: 8px 16px; font-size: 13px; color: #fff; border-color: #493D82; background: #261F4D;"><i class="fa-solid fa-handshake"></i> Tambah Mitra</button>
             </div>
           </div>
 
-          <!-- Panel Akun Aktif -->
-          <div style="background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 20px;">
-            <p style="color: #8b5cf6; font-size: 11px; font-weight: 700; margin: 0 0 4px 0; text-transform: uppercase;">ADMIN PLATFORM</p>
-            <h4 style="margin: 0 0 16px 0; color: #f3f4f6; font-size: 16px;">Akun aktif</h4>
-            <div style="font-size: 13px; color: #d1d5db; display: flex; flex-direction: column; gap: 10px;">
-              <div style="display: flex; justify-content: space-between;"><span style="color: #9ca3af;">Email</span> <span style="font-weight: 600; color: #fff;">admin@devr.sch.id</span></div>
-              <div style="display: flex; justify-content: space-between; border-top: 1px solid #374151; padding-top: 8px;"><span style="color: #9ca3af;">Peran</span> <span>Platform Admin</span></div>
-              <div style="display: flex; justify-content: space-between; border-top: 1px solid #374151; padding-top: 8px;"><span style="color: #9ca3af;">Tenant ID</span> <span style="font-family: monospace; font-size: 11px; color: #9ca3af;">4eb88c5b-5b42-4c31-b16f-17dd38bc0ace</span></div>
-              <div style="display: flex; justify-content: space-between; border-top: 1px solid #374151; padding-top: 8px;"><span style="color: #9ca3af;">School ID</span> <span style="font-family: monospace; font-size: 11px; color: #9ca3af;">fc64c2c0-f2e8-4b42-b40f-4d47b80c57a7</span></div>
+          <!-- 5 Stat Cards Admin -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 24px;">
+            <div class="summary-card">
+              <p class="summary-label">TENANT TERDAFTAR</p>
+              <h3 id="stat-total-tenants" class="summary-value">2</h3>
+              <p class="summary-caption">Data tenant aktif di CDGS</p>
             </div>
-            <p style="margin-top: 16px; color: #6b7280; font-size: 11px; margin-bottom: 0;">Informasi mengikuti akun yang sedang masuk.</p>
+            <div class="summary-card">
+              <p class="summary-label">DOMAIN TERCATAT</p>
+              <h3 id="stat-domain-registered" class="summary-value">2</h3>
+              <p class="summary-caption">Tenant terhubung domain</p>
+            </div>
+            <div class="summary-card">
+              <p class="summary-label">SEKOLAH TERDAFTAR</p>
+              <h3 id="stat-admin-schools" class="summary-value">0</h3>
+              <p class="summary-caption">Sekolah dalam database</p>
+            </div>
+            <div class="summary-card">
+              <p class="summary-label">MITRA DUDI & PTN</p>
+              <h3 id="stat-admin-partners" class="summary-value">0</h3>
+              <p class="summary-caption">Mitra terhubung</p>
+            </div>
+            <div class="summary-card summary-card-primary">
+              <p class="summary-label">CAKUPAN AKUN</p>
+              <h3 class="summary-value" style="font-size: 1.15rem;">Multi-Tenant</h3>
+              <p class="summary-caption">Akses penuh sistem</p>
+            </div>
           </div>
-        </div>
 
-        <!-- 3. Tab Navigasi & Tabel Data Tenant -->
-        <div style="margin-bottom: 32px;">
-          <div style="display: flex; gap: 20px; border-bottom: 1px solid #374151; margin-bottom: 16px; padding-bottom: 8px;">
-            <span style="color: #8b5cf6; font-weight: 600; border-bottom: 2px solid #8b5cf6; padding-bottom: 8px; cursor: pointer;">Daftar tenant</span>
-            <span style="color: #9ca3af; cursor: pointer;">Status domain</span>
-            <span style="color: #9ca3af; cursor: pointer;">Akun aktif</span>
+          <!-- Section Tengah: Chart & Panel Akun -->
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px;">
+            <div class="panel">
+              <div class="panel-heading">
+                <div>
+                  <h4 style="margin: 0; color: #f3f4f6; font-size: 15px;">Kelengkapan Domain Tenant</h4>
+                  <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 12px;">Distribusi domain aktif pada master tenant.</p>
+                </div>
+              </div>
+              <div style="position: relative; height: 190px; width: 100%;">
+                <canvas id="tenantDomainChart"></canvas>
+              </div>
+            </div>
+
+            <div class="panel">
+              <p style="color: #8b5cf6; font-size: 11px; font-weight: 700; margin: 0 0 4px 0; text-transform: uppercase;">ADMIN PLATFORM</p>
+              <h4 style="margin: 0 0 14px 0; color: #f3f4f6; font-size: 15px;">Akun Administrator</h4>
+              <div style="font-size: 13px; color: #d1d5db; display: flex; flex-direction: column; gap: 9px;">
+                <div style="display: flex; justify-content: space-between;"><span style="color: #9ca3af;">Email</span> <span id="admin-panel-email" style="font-weight: 600; color: #fff;">admin@devr.sch.id</span></div>
+                <div style="display: flex; justify-content: space-between; border-top: 1px solid #26334A; padding-top: 8px;"><span style="color: #9ca3af;">Peran</span> <span class="role-badge badge-admin">Platform Admin</span></div>
+                <div style="display: flex; justify-content: space-between; border-top: 1px solid #26334A; padding-top: 8px;"><span style="color: #9ca3af;">Tenant ID</span> <span style="font-family: monospace; font-size: 11px; color: #9ca3af;">4eb88c5b...</span></div>
+                <div style="display: flex; justify-content: space-between; border-top: 1px solid #26334A; padding-top: 8px;"><span style="color: #9ca3af;">Database</span> <span style="color: #10B981; font-weight: 500;">Neon PostgreSQL</span></div>
+              </div>
+            </div>
           </div>
 
-          <div style="background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 20px;">
+          <!-- Tab Navigation Admin -->
+          <div class="nav-pills">
+            <button class="nav-pill active" onclick="switchAdminTab('schools', this)"><i class="fa-solid fa-school"></i> Data Sekolah</button>
+            <button class="nav-pill" onclick="switchAdminTab('partners', this)"><i class="fa-solid fa-handshake"></i> Mitra DUDI & PTN</button>
+            <button class="nav-pill" onclick="switchAdminTab('tenants', this)"><i class="fa-solid fa-building"></i> Data Tenant</button>
+          </div>
+
+          <!-- Tab 1: Data Sekolah -->
+          <div id="admin-tab-schools" class="admin-tab-content panel" style="margin-bottom: 24px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
               <div>
-                <p style="color: #8b5cf6; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">DATA PLATFORM</p>
-                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Tenant terdaftar</h4>
+                <p style="color: #8b5cf6; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">MANAJEMEN DATA</p>
+                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Daftar Sekolah Terdaftar</h4>
               </div>
-              <div style="display: flex; gap: 8px; align-items: center;">
-                <button style="background: #8b5cf6; color: white; border: none; padding: 6px 14px; border-radius: 16px; font-size: 12px; cursor: pointer;">Semua</button>
-                <button style="background: #374151; color: #9ca3af; border: none; padding: 6px 14px; border-radius: 16px; font-size: 12px; cursor: pointer;">Ada domain</button>
-                <button style="background: #374151; color: #9ca3af; border: none; padding: 6px 14px; border-radius: 16px; font-size: 12px; cursor: pointer;">Belum ada</button>
-                <select style="background: #374151; color: white; border: 1px solid #4b5563; padding: 6px 12px; border-radius: 6px; font-size: 12px; margin-left: 8px;">
-                  <option>Terbaru</option>
-                </select>
-              </div>
+              <button onclick="openSchoolModal()" class="btn-primary" style="width: auto; padding: 7px 14px; font-size: 13px;"><i class="fa-solid fa-plus"></i> Tambah Sekolah</button>
             </div>
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; color: #f3f4f6; text-align: left; font-size: 13px;">
+                <thead>
+                  <tr style="border-bottom: 1px solid #374151; color: #9ca3af; font-size: 12px;">
+                    <th style="padding: 10px;">No</th>
+                    <th style="padding: 10px;">NPSN</th>
+                    <th style="padding: 10px;">Nama Sekolah</th>
+                    <th style="padding: 10px;">Jenjang</th>
+                    <th style="padding: 10px;">Status</th>
+                    <th style="padding: 10px;">Akreditasi</th>
+                    <th style="padding: 10px;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="schoolTableBody">
+                  <tr><td colspan="7" style="text-align: center; padding: 20px; color: #9ca3af;">Memuat data sekolah...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-            <table style="width: 100%; border-collapse: collapse; color: #f3f4f6; text-align: left; font-size: 14px;">
+          <!-- Tab 2: Mitra DUDI & PTN -->
+          <div id="admin-tab-partners" class="admin-tab-content panel" style="display: none; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div>
+                <p style="color: #8b5cf6; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">JARINGAN INDUSTRI</p>
+                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Daftar Mitra DUDI & PTN</h4>
+              </div>
+              <button onclick="openPartnerModal()" class="btn-primary" style="width: auto; padding: 7px 14px; font-size: 13px;"><i class="fa-solid fa-plus"></i> Tambah Mitra</button>
+            </div>
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; color: #f3f4f6; text-align: left; font-size: 13px;">
+                <thead>
+                  <tr style="border-bottom: 1px solid #374151; color: #9ca3af; font-size: 12px;">
+                    <th style="padding: 10px;">Nama Instansi</th>
+                    <th style="padding: 10px;">Kategori</th>
+                    <th style="padding: 10px;">Kontak (CP)</th>
+                    <th style="padding: 10px;">Telepon</th>
+                    <th style="padding: 10px;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="partner-table-body">
+                  <tr><td colspan="5" style="text-align: center; padding: 20px; color: #9ca3af;">Memuat data mitra...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tab 3: Data Tenant -->
+          <div id="admin-tab-tenants" class="admin-tab-content panel" style="display: none; margin-bottom: 24px;">
+            <div style="margin-bottom: 16px;">
+              <p style="color: #8b5cf6; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">MULTI-TENANCY</p>
+              <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Tenant Terdaftar</h4>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; color: #f3f4f6; text-align: left; font-size: 13px;">
               <thead>
                 <tr style="border-bottom: 1px solid #374151; color: #9ca3af; font-size: 12px;">
-                  <th style="padding: 12px 10px;">NAMA TENANT</th>
-                  <th style="padding: 12px 10px;">DOMAIN</th>
-                  <th style="padding: 12px 10px;">TANGGAL DIBUAT</th>
+                  <th style="padding: 10px;">NAMA TENANT</th>
+                  <th style="padding: 10px;">DOMAIN</th>
+                  <th style="padding: 10px;">TANGGAL DIBUAT</th>
                 </tr>
               </thead>
               <tbody id="tenant-table-body">
-                <tr style="border-bottom: 1px solid #374151;">
-                  <td style="padding: 12px 10px; font-weight: 600;">DEV1</td>
-                  <td style="padding: 12px 10px; color: #d1d5db;">dev-1.id</td>
-                  <td style="padding: 12px 10px; color: #d1d5db;">25 Sep 2026</td>
+                <tr style="border-bottom: 1px solid #26334A;">
+                  <td style="padding: 10px; font-weight: 600;">DEV1</td>
+                  <td style="padding: 10px; color: #8B5CF6;">dev-1.id</td>
+                  <td style="padding: 10px; color: #9ca3af;">25 Sep 2026</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #374151;">
-                  <td style="padding: 12px 10px; font-weight: 600;">MAN 1</td>
-                  <td style="padding: 12px 10px; color: #d1d5db;">man-1.cdgs.id</td>
-                  <td style="padding: 12px 10px; color: #d1d5db;">25 Sep 2026</td>
+                <tr style="border-bottom: 1px solid #26334A;">
+                  <td style="padding: 10px; font-weight: 600;">MAN 1</td>
+                  <td style="padding: 10px; color: #8B5CF6;">man-1.cdgs.id</td>
+                  <td style="padding: 10px; color: #9ca3af;">25 Sep 2026</td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </div>
+        </section>
 
-        <!-- 4. Modul Tambahan: Mitra DUDI & PTN -->
-        <div style="margin-top: 32px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="margin: 0; color: #f3f4f6; font-size: 18px;">Daftar Mitra DUDI & PTN</h3>
-            <button id="btn-add-partner" onclick="openPartnerModal()" style="background: #8b5cf6; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px;">+ Tambah Mitra</button>
+        <!-- ================================================================= -->
+        <!-- VIEW 2: KEPALA SEKOLAH                                            -->
+        <!-- ================================================================= -->
+        <section id="view-role-kepsek" class="role-dashboard-view" style="display: none;">
+          <!-- Hero Banner Kepala Sekolah -->
+          <div class="role-hero-banner hero-kepsek">
+            <div class="hero-content">
+              <span class="eyebrow" style="color: #93C5FD;"><i class="fa-solid fa-graduation-cap"></i> RUANG EKSEKUTIF KEPALA SEKOLAH</span>
+              <h2>Laporan Capaian & Ekosistem Mutu Sekolah</h2>
+              <p>Pantau ketercapaian talenta siswa, efektivitas bimbingan guru, kesiapan akreditasi, serta jejaring kemitraan DUDI dan perguruan tinggi secara komprehensif.</p>
+            </div>
+            <div class="hero-actions">
+              <button onclick="downloadExecutiveReport()" class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 13px; background: #2563eb;"><i class="fa-solid fa-file-pdf"></i> Unduh Rekap Laporan</button>
+            </div>
           </div>
 
-          <div style="background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 16px; overflow-x: auto; margin-bottom: 40px;">
-            <table style="width: 100%; border-collapse: collapse; color: #f3f4f6; text-align: left; font-size: 14px;">
+          <!-- 4 Stat Cards Kepala Sekolah -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px;">
+            <div class="summary-card">
+              <p class="summary-label">TOTAL SISWA AKTIF</p>
+              <h3 class="summary-value" style="color: #60A5FA;">428</h3>
+              <p class="summary-caption">3 Jenjang kejuruan/peminatan</p>
+            </div>
+            <div class="summary-card">
+              <p class="summary-label">PORTOFOLIO TERVALIDASI</p>
+              <h3 class="summary-value" style="color: #34D399;">312</h3>
+              <p class="summary-caption">Terakreditasi guru pembimbing</p>
+            </div>
+            <div class="summary-card">
+              <p class="summary-label">MITRA DUDI & KAMPUS PTN</p>
+              <h3 id="stat-kepsek-partners" class="summary-value" style="color: #FBBF24;">18</h3>
+              <p class="summary-caption">MoU Kemitraan Aktif</p>
+            </div>
+            <div class="summary-card">
+              <p class="summary-label">SERAPAN PKL & KESIAPAN</p>
+              <h3 class="summary-value" style="color: #A78BFA;">94.2%</h3>
+              <p class="summary-caption">Siswa memenuhi standar industri</p>
+            </div>
+          </div>
+
+          <!-- Visualisasi Distribusi & Kemitraan -->
+          <div style="display: grid; grid-template-columns: 1.6fr 1.2fr; gap: 16px; margin-bottom: 24px;">
+            <div class="panel">
+              <div class="panel-heading">
+                <div>
+                  <h4 style="margin: 0; color: #f3f4f6; font-size: 15px;">Distribusi Talenta Siswa Berdasarkan Bidang</h4>
+                  <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 12px;">Pemetaan keahlian siswa yang telah terverifikasi oleh para pembimbing.</p>
+                </div>
+              </div>
+              <div style="position: relative; height: 210px; width: 100%;">
+                <canvas id="kepsekTalentChart"></canvas>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-heading">
+                <div>
+                  <h4 style="margin: 0; color: #f3f4f6; font-size: 15px;">Status Kerja Sama Kemitraan</h4>
+                  <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 12px;">Realisasi penyerapan siswa magang / PKL.</p>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="background: #18243A; padding: 12px; border-radius: 6px; border-left: 4px solid #3B82F6;">
+                  <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
+                    <span>PT Telkom Indonesia</span>
+                    <span style="color: #60A5FA;">12 Siswa PKL</span>
+                  </div>
+                  <p style="font-size: 11px; color: #9ca3af; margin: 4px 0 0;">Bidang: Software Engineering & Jaringan</p>
+                </div>
+                <div style="background: #18243A; padding: 12px; border-radius: 6px; border-left: 4px solid #10B981;">
+                  <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
+                    <span>Studio Animasi Digital Kreatif</span>
+                    <span style="color: #34D399;">8 Siswa PKL</span>
+                  </div>
+                  <p style="font-size: 11px; color: #9ca3af; margin: 4px 0 0;">Bidang: UI/UX & Motion Design</p>
+                </div>
+                <div style="background: #18243A; padding: 12px; border-radius: 6px; border-left: 4px solid #F59E0B;">
+                  <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
+                    <span>Universitas Indonesia & ITB (PTN)</span>
+                    <span style="color: #FBBF24;">Jalur Prestasi</span>
+                  </div>
+                  <p style="font-size: 11px; color: #9ca3af; margin: 4px 0 0;">15 Portofolio Diajukan Beasiswa</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabel Talenta Unggulan Sekolah -->
+          <div class="panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <div>
+                <p style="color: #60A5FA; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">HIGHLIGHT PRESTASI</p>
+                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Siswa Berprestasi & Karya Unggulan Sekolah</h4>
+              </div>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; color: #f3f4f6; text-align: left; font-size: 13px;">
               <thead>
-                <tr style="border-bottom: 1px solid #374151; color: #9ca3af;">
-                  <th style="padding: 12px 10px;">Nama Instansi</th>
-                  <th style="padding: 12px 10px;">Kategori</th>
-                  <th style="padding: 12px 10px;">Kontak (CP)</th>
-                  <th style="padding: 12px 10px;">Telepon</th>
-                  <th style="padding: 12px 10px;">Aksi</th>
+                <tr style="border-bottom: 1px solid #26334A; color: #9ca3af; font-size: 12px;">
+                  <th style="padding: 10px;">Nama Siswa</th>
+                  <th style="padding: 10px;">Kelas / Jurusan</th>
+                  <th style="padding: 10px;">Capaian / Portofolio</th>
+                  <th style="padding: 10px;">Mitra Tertarik</th>
+                  <th style="padding: 10px;">Status Kesiapan</th>
                 </tr>
               </thead>
-              <tbody id="partner-table-body">
-                <tr>
-                  <td colspan="5" style="text-align: center; padding: 20px; color: #9ca3af;">Memuat data mitra...</td>
+              <tbody>
+                <tr style="border-bottom: 1px solid #1E293B;">
+                  <td style="padding: 10px; font-weight: 600;">Ahmad Rizqi</td>
+                  <td style="padding: 10px; color: #9ca3af;">XII - RPL 1</td>
+                  <td style="padding: 10px;">Juara 1 LKS Web Technologies 2026</td>
+                  <td style="padding: 10px; color: #93C5FD;">PT Telkom Indonesia</td>
+                  <td style="padding: 10px;"><span class="portfolio-badge-verified">⭐ Siap Kerja</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #1E293B;">
+                  <td style="padding: 10px; font-weight: 600;">Siti Nurhaliza</td>
+                  <td style="padding: 10px; color: #9ca3af;">XII - DKV 2</td>
+                  <td style="padding: 10px;">Design System Aplikasi Sekolah Pintar</td>
+                  <td style="padding: 10px; color: #93C5FD;">Studio Animasi Digital</td>
+                  <td style="padding: 10px;"><span class="portfolio-badge-verified">⭐ Siap Kerja</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #1E293B;">
+                  <td style="padding: 10px; font-weight: 600;">Budi Prasetyo</td>
+                  <td style="padding: 10px; color: #9ca3af;">XI - TKJ 1</td>
+                  <td style="padding: 10px;">Otomasi Mikrotik Router & VPN Sekolah</td>
+                  <td style="padding: 10px; color: #93C5FD;">PT Solusi Jaringan</td>
+                  <td style="padding: 10px;"><span class="portfolio-badge-verified">⭐ Siap Kerja</span></td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </div>
+        </section>
 
-        <!-- Modal Form Tambah Mitra -->
-        <div id="partner-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000;">
-          <div style="background: #1f2937; border: 1px solid #374151; padding: 24px; border-radius: 8px; width: 400px; color: #fff;">
-            <h4 style="margin-top: 0; margin-bottom: 16px; font-size: 18px;">Tambah Mitra Baru</h4>
-            <form id="partner-form">
-              <div style="margin-bottom: 12px;">
-                <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">Nama Instansi / Perusahaan</label>
-                <input type="text" id="partner-name" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff; box-sizing: border-box;">
+        <!-- ================================================================= -->
+        <!-- VIEW 3: GURU PEMBIMBING                                           -->
+        <!-- ================================================================= -->
+        <section id="view-role-guru" class="role-dashboard-view" style="display: none;">
+          <!-- Hero Banner Guru -->
+          <div class="role-hero-banner hero-guru">
+            <div class="hero-content">
+              <span class="eyebrow" style="color: #6EE7B7;"><i class="fa-solid fa-chalkboard-user"></i> RUANG KERJA GURU PEMBIMBING</span>
+              <h2>Bimbingan Talenta & Verifikasi Portofolio</h2>
+              <p>Validasi pengajuan proyek dan kompetensi siswa binaan Anda, berikan masukan konstruktif, serta rekomendasikan siswa ke mitra DUDI.</p>
+            </div>
+            <div class="hero-actions">
+              <button onclick="scrollToReviewQueue()" class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 13px; background: #059669;"><i class="fa-solid fa-check-double"></i> Review Antrean (3)</button>
+            </div>
+          </div>
+
+          <!-- 4 Stat Cards Guru -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px;">
+            <div class="summary-card">
+              <p class="summary-label">SISWA BIMBINGAN</p>
+              <h3 class="summary-value" style="color: #34D399;">36</h3>
+              <p class="summary-caption">Siswa aktif dalam binaan</p>
+            </div>
+            <div class="summary-card" style="border-color: #065F46;">
+              <p class="summary-label">MENUNGGU VALIDASI</p>
+              <h3 id="stat-guru-pending" class="summary-value" style="color: #FCD34D;">3</h3>
+              <p class="summary-caption">Portofolio butuh verifikasi</p>
+            </div>
+            <div class="summary-card">
+              <p class="summary-label">SISWA SEDANG PKL</p>
+              <h3 class="summary-value" style="color: #60A5FA;">14</h3>
+              <p class="summary-caption">Di 6 Mitra Industri</p>
+            </div>
+            <div class="summary-card">
+              <p class="summary-label">PORTOFOLIO TERVALIDASI</p>
+              <h3 id="stat-guru-verified" class="summary-value" style="color: #A78BFA;">58</h3>
+              <p class="summary-caption">Siap ditinjau industri</p>
+            </div>
+          </div>
+
+          <!-- Antrean Validasi Portofolio Siswa -->
+          <div id="section-review-queue" class="panel" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div>
+                <p style="color: #10B981; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">BUTUH TINJAUAN GURU</p>
+                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Antrean Pengajuan Portofolio Siswa</h4>
               </div>
-              <div style="margin-bottom: 12px;">
-                <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">Kategori</label>
-                <select id="partner-category" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff; box-sizing: border-box;">
-                  <option value="DUDI">DUDI (Dunia Usaha / Industri)</option>
-                  <option value="PTN">PTN (Perguruan Tinggi)</option>
+              <span class="role-badge badge-guru">Prioritas Bimbingan</span>
+            </div>
+
+            <div id="guru-queue-list">
+              <!-- Item 1 -->
+              <div class="review-item" id="review-item-1">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <span style="font-weight: 600; color: #fff;">Muhammad Razan</span>
+                    <span style="font-size: 11px; color: #9ca3af;">• XII RPL 1</span>
+                    <span class="portfolio-badge-pending">⏳ Menunggu Validasi</span>
+                  </div>
+                  <h5 style="margin: 0 0 4px 0; color: #6EE7B7; font-size: 14px;">Aplikasi Fullstack Web Point-of-Sale CDGS</h5>
+                  <p style="margin: 0; color: #8F9DB4; font-size: 12px;">Teknologi: Node.js, Express, PostgreSQL, Vanilla CSS. Dilengkapi autentikasi JWT dan multi-tenant.</p>
+                </div>
+                <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                  <button onclick="guruApprovePortfolio(1, 'Muhammad Razan', 'Aplikasi Fullstack Web Point-of-Sale')" class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 12px; background: #059669;"><i class="fa-solid fa-check"></i> Setujui & Beri Badge</button>
+                  <button onclick="guruRevisePortfolio(1, 'Muhammad Razan')" class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px; color: #FCD34D; border-color: #78350F; background: #2E1F08;"><i class="fa-solid fa-comment-dots"></i> Beri Catatan</button>
+                </div>
+              </div>
+
+              <!-- Item 2 -->
+              <div class="review-item" id="review-item-2">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <span style="font-weight: 600; color: #fff;">Dewi Lestari</span>
+                    <span style="font-size: 11px; color: #9ca3af;">• XII DKV 2</span>
+                    <span class="portfolio-badge-pending">⏳ Menunggu Validasi</span>
+                  </div>
+                  <h5 style="margin: 0 0 4px 0; color: #6EE7B7; font-size: 14px;">Redesain Antarmuka Mobile Portal Magang Siswa</h5>
+                  <p style="margin: 0; color: #8F9DB4; font-size: 12px;">Prototype Figma interaktif 24 layar dengan panduan Design System & WCAG AA Accessibility.</p>
+                </div>
+                <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                  <button onclick="guruApprovePortfolio(2, 'Dewi Lestari', 'Redesain Antarmuka Mobile Portal')" class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 12px; background: #059669;"><i class="fa-solid fa-check"></i> Setujui & Beri Badge</button>
+                  <button onclick="guruRevisePortfolio(2, 'Dewi Lestari')" class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px; color: #FCD34D; border-color: #78350F; background: #2E1F08;"><i class="fa-solid fa-comment-dots"></i> Beri Catatan</button>
+                </div>
+              </div>
+
+              <!-- Item 3 -->
+              <div class="review-item" id="review-item-3">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <span style="font-weight: 600; color: #fff;">Farhan Maulana</span>
+                    <span style="font-size: 11px; color: #9ca3af;">• XI TKJ 2</span>
+                    <span class="portfolio-badge-pending">⏳ Menunggu Validasi</span>
+                  </div>
+                  <h5 style="margin: 0 0 4px 0; color: #6EE7B7; font-size: 14px;">Infrastruktur Server Linux & Firewall VPN</h5>
+                  <p style="margin: 0; color: #8F9DB4; font-size: 12px;">Konfigurasi Ubuntu Server dengan WireGuard VPN, Nginx Reverse Proxy, dan automated backup cron.</p>
+                </div>
+                <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                  <button onclick="guruApprovePortfolio(3, 'Farhan Maulana', 'Infrastruktur Server Linux')" class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 12px; background: #059669;"><i class="fa-solid fa-check"></i> Setujui & Beri Badge</button>
+                  <button onclick="guruRevisePortfolio(3, 'Farhan Maulana')" class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px; color: #FCD34D; border-color: #78350F; background: #2E1F08;"><i class="fa-solid fa-comment-dots"></i> Beri Catatan</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabel Siswa Bimbingan -->
+          <div class="panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <div>
+                <p style="color: #10B981; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">KELAS BINAAN</p>
+                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Daftar Siswa Bimbingan & Pemetaan Skill</h4>
+              </div>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; color: #f3f4f6; text-align: left; font-size: 13px;">
+              <thead>
+                <tr style="border-bottom: 1px solid #26334A; color: #9ca3af; font-size: 12px;">
+                  <th style="padding: 10px;">Nama Siswa</th>
+                  <th style="padding: 10px;">NISN</th>
+                  <th style="padding: 10px;">Keahlian Utama</th>
+                  <th style="padding: 10px;">Portofolio Disetujui</th>
+                  <th style="padding: 10px;">Status PKL / Industri</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #1E293B;">
+                  <td style="padding: 10px; font-weight: 600;">Muhammad Razan</td>
+                  <td style="padding: 10px; color: #9ca3af;">0068492011</td>
+                  <td style="padding: 10px;"><span class="skill-tag">JavaScript</span> <span class="skill-tag">PostgreSQL</span></td>
+                  <td style="padding: 10px; color: #34D399;">4 Proyek</td>
+                  <td style="padding: 10px;"><span class="role-badge badge-guru">Siap Disalurkan</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #1E293B;">
+                  <td style="padding: 10px; font-weight: 600;">Dewi Lestari</td>
+                  <td style="padding: 10px; color: #9ca3af;">0068492012</td>
+                  <td style="padding: 10px;"><span class="skill-tag">UI/UX</span> <span class="skill-tag">Figma</span></td>
+                  <td style="padding: 10px; color: #34D399;">3 Proyek</td>
+                  <td style="padding: 10px;"><span class="role-badge badge-kepsek">Magang di Studio Digital</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #1E293B;">
+                  <td style="padding: 10px; font-weight: 600;">Farhan Maulana</td>
+                  <td style="padding: 10px; color: #9ca3af;">0068492013</td>
+                  <td style="padding: 10px;"><span class="skill-tag">Mikrotik</span> <span class="skill-tag">Linux</span></td>
+                  <td style="padding: 10px; color: #34D399;">2 Proyek</td>
+                  <td style="padding: 10px;"><span class="role-badge badge-admin">Sedang PKL (Telkom)</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- VIEW 4: MURID (TALENTA SISWA)                                     -->
+        <!-- ================================================================= -->
+        <section id="view-role-murid" class="role-dashboard-view" style="display: none;">
+          <!-- Hero Banner Murid -->
+          <div class="role-hero-banner hero-murid">
+            <div class="hero-content">
+              <span class="eyebrow" style="color: #FCD34D;"><i class="fa-solid fa-user-astronaut"></i> RUANG TALENTA SISWA</span>
+              <h2>Portofolio & Rekam Jejak Kompetensi</h2>
+              <p>Tampilkan karya terbaikmu kepada industri dan perguruan tinggi. Dapatkan verifikasi dari guru pembimbing untuk membuka peluang magang impian.</p>
+            </div>
+            <div class="hero-actions">
+              <button onclick="openAddPortfolioModal()" class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 13px; background: #d97706;"><i class="fa-solid fa-plus"></i> Unggah Portofolio Baru</button>
+            </div>
+          </div>
+
+          <!-- Profil Siswa Card & 4 Stat Cards -->
+          <div style="display: grid; grid-template-columns: 1.2fr 2fr; gap: 16px; margin-bottom: 24px;">
+            <!-- Profil Card -->
+            <div class="panel" style="display: flex; flex-direction: column; justify-content: center;">
+              <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
+                <div class="talent-avatar" style="width: 56px; height: 56px; font-size: 1.4rem; background: linear-gradient(135deg, #F59E0B, #D97706);">
+                  MR
+                </div>
+                <div>
+                  <h3 id="murid-profile-name" style="margin: 0; color: #f3f4f6; font-size: 16px;">Muhammad Razan</h3>
+                  <p style="margin: 2px 0 0; color: #9ca3af; font-size: 12px;">NISN: 0068492011 • Rekayasa Perangkat Lunak</p>
+                  <span class="role-badge badge-murid" style="margin-top: 6px;">⭐ Siap Disalurkan ke Industri</span>
+                </div>
+              </div>
+              <div style="border-top: 1px solid #26334A; padding-top: 10px;">
+                <p style="font-size: 11px; color: #9ca3af; margin: 0 0 6px 0;">BADGES KEAHLIAN TERVALIDASI:</p>
+                <div class="skill-tags" style="margin: 0;">
+                  <span class="skill-tag skill-tag-highlight">JavaScript</span>
+                  <span class="skill-tag skill-tag-highlight">Node.js</span>
+                  <span class="skill-tag">PostgreSQL</span>
+                  <span class="skill-tag">REST API</span>
+                  <span class="skill-tag">Git</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4 Quick Stats Murid -->
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+              <div class="summary-card">
+                <p class="summary-label">SKOR KESIAPAN TALENTA</p>
+                <h3 class="summary-value" style="color: #FBBF24;">92 <small style="font-size: 12px; color: #8F9DB4;">/ 100</small></h3>
+                <p class="summary-caption">Peringkat 5% Teratas Jurusan</p>
+              </div>
+              <div class="summary-card">
+                <p class="summary-label">KARYA TERVALIDASI</p>
+                <h3 id="stat-murid-verified-count" class="summary-value" style="color: #34D399;">4</h3>
+                <p class="summary-caption">Disetujui guru pembimbing</p>
+              </div>
+              <div class="summary-card">
+                <p class="summary-label">LENCANA KOMPETENSI</p>
+                <h3 class="summary-value" style="color: #60A5FA;">6 Badges</h3>
+                <p class="summary-caption">Kemampuan teruji</p>
+              </div>
+              <div class="summary-card">
+                <p class="summary-label">PELUANG MAGANG TERBUKA</p>
+                <h3 class="summary-value" style="color: #F472B6;">8 Mitra</h3>
+                <p class="summary-caption">Sesuai skill profil kamu</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Galeri Portofolio Proyek Saya -->
+          <div class="panel" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <div>
+                <p style="color: #F59E0B; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">KARYA & PROYEK</p>
+                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Galeri Portofolio Saya</h4>
+              </div>
+              <button onclick="openAddPortfolioModal()" class="btn-primary" style="width: auto; padding: 6px 14px; font-size: 12px; background: #d97706;"><i class="fa-solid fa-plus"></i> Tambah Proyek</button>
+            </div>
+
+            <div class="portfolio-grid" id="murid-portfolio-grid">
+              <!-- Proyek 1 -->
+              <div class="portfolio-card">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                  <span class="portfolio-badge-verified"><i class="fa-solid fa-circle-check"></i> Terverifikasi</span>
+                  <span style="font-size: 11px; color: #8F9DB4;">Web App</span>
+                </div>
+                <h4 style="margin: 0 0 6px 0; color: #F3F5FA; font-size: 15px;">Sistem Manajemen Perpustakaan Sekolah</h4>
+                <p style="margin: 0 0 10px 0; color: #8F9DB4; font-size: 12px; line-height: 1.4;">Aplikasi web peminjaman buku berbasis QR Code dengan katalog digital real-time.</p>
+                <div class="skill-tags">
+                  <span class="skill-tag">Node.js</span>
+                  <span class="skill-tag">PostgreSQL</span>
+                  <span class="skill-tag">Express</span>
+                </div>
+                <div style="margin-top: auto; border-top: 1px solid #26334A; padding-top: 8px; display: flex; justify-content: space-between; font-size: 11px; color: #6EE7B7;">
+                  <span>Pembimbing: Bpk. Budi Santoso</span>
+                  <a href="#" style="color: #60A5FA; text-decoration: none;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Demo</a>
+                </div>
+              </div>
+
+              <!-- Proyek 2 -->
+              <div class="portfolio-card">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                  <span class="portfolio-badge-verified"><i class="fa-solid fa-circle-check"></i> Terverifikasi</span>
+                  <span style="font-size: 11px; color: #8F9DB4;">UI/UX</span>
+                </div>
+                <h4 style="margin: 0 0 6px 0; color: #F3F5FA; font-size: 15px;">Redesain Portal Magang Siswa SMK</h4>
+                <p style="margin: 0 0 10px 0; color: #8F9DB4; font-size: 12px; line-height: 1.4;">Desain antarmuka mobile-first untuk memudahkan siswa mencari dan melamar posisi PKL di industri.</p>
+                <div class="skill-tags">
+                  <span class="skill-tag">Figma</span>
+                  <span class="skill-tag">Prototyping</span>
+                </div>
+                <div style="margin-top: auto; border-top: 1px solid #26334A; padding-top: 8px; display: flex; justify-content: space-between; font-size: 11px; color: #6EE7B7;">
+                  <span>Pembimbing: Ibu Ratna Dewi</span>
+                  <a href="#" style="color: #60A5FA; text-decoration: none;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Figma</a>
+                </div>
+              </div>
+
+              <!-- Proyek 3 -->
+              <div class="portfolio-card">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                  <span class="portfolio-badge-pending"><i class="fa-solid fa-clock"></i> Menunggu Guru</span>
+                  <span style="font-size: 11px; color: #8F9DB4;">Fullstack</span>
+                </div>
+                <h4 style="margin: 0 0 6px 0; color: #F3F5FA; font-size: 15px;">Aplikasi Fullstack Web POS CDGS</h4>
+                <p style="margin: 0 0 10px 0; color: #8F9DB4; font-size: 12px; line-height: 1.4;">Aplikasi kasir multi-tenant modern dengan laporan penjualan otomatis dan cetak struk.</p>
+                <div class="skill-tags">
+                  <span class="skill-tag">JavaScript</span>
+                  <span class="skill-tag">PostgreSQL</span>
+                </div>
+                <div style="margin-top: auto; border-top: 1px solid #26334A; padding-top: 8px; display: flex; justify-content: space-between; font-size: 11px; color: #FCD34D;">
+                  <span>Status: Dalam antrean guru</span>
+                  <a href="#" style="color: #60A5FA; text-decoration: none;"><i class="fa-solid fa-code"></i> Repo</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rekomendasi Magang DUDI Cocok -->
+          <div class="panel">
+            <div style="margin-bottom: 12px;">
+              <p style="color: #F59E0B; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">PELUANG UNTUKMU</p>
+              <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Rekomendasi Magang Industri (DUDI) yang Membuka Kuota</h4>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+              <div style="background: #18243A; padding: 14px; border-radius: 8px; border: 1px solid #26334A;">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                  <h5 style="margin: 0; color: #fff; font-size: 14px;">Junior Web Developer Intern</h5>
+                  <span class="role-badge badge-guru">Kuota: 3</span>
+                </div>
+                <p style="color: #60A5FA; font-size: 12px; margin: 3px 0 8px;">PT Telkom Indonesia</p>
+                <p style="color: #8F9DB4; font-size: 11px; margin-bottom: 10px;">Kualifikasi: Menguasai HTML/CSS, JavaScript modern, dan dasar database SQL.</p>
+                <button onclick="alert('Minat magang kamu berhasil dikirimkan ke PT Telkom Indonesia!')" class="btn-primary" style="padding: 5px 12px; font-size: 12px; width: auto; background: #2563eb;">Ajukan Minat Magang</button>
+              </div>
+
+              <div style="background: #18243A; padding: 14px; border-radius: 8px; border: 1px solid #26334A;">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                  <h5 style="margin: 0; color: #fff; font-size: 14px;">UI/UX Design Apprentice</h5>
+                  <span class="role-badge badge-guru">Kuota: 2</span>
+                </div>
+                <p style="color: #60A5FA; font-size: 12px; margin: 3px 0 8px;">Studio Animasi Digital Kreatif</p>
+                <p style="color: #8F9DB4; font-size: 11px; margin-bottom: 10px;">Kualifikasi: Mampu membuat wireframe & clickable prototype di Figma.</p>
+                <button onclick="alert('Minat magang kamu berhasil dikirimkan ke Studio Animasi Digital!')" class="btn-primary" style="padding: 5px 12px; font-size: 12px; width: auto; background: #2563eb;">Ajukan Minat Magang</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- VIEW 5: INSTANSI (DUDI / PTN / FIND TALENT)                       -->
+        <!-- ================================================================= -->
+        <section id="view-role-instansi" class="role-dashboard-view" style="display: none;">
+          <!-- Hero Banner Instansi -->
+          <div class="role-hero-banner hero-instansi">
+            <div class="hero-content">
+              <span class="eyebrow" style="color: #F9A8D4;"><i class="fa-solid fa-briefcase"></i> MITRA DUDI & KAMPUS PTN</span>
+              <h2>Eksplorasi Talenta Siswa (Find Talent)</h2>
+              <p>Temukan siswa-siswi berbakat dengan portofolio terverifikasi untuk kebutuhan program magang PKL industri, rekrutmen talenta muda, atau beasiswa prestasi.</p>
+            </div>
+            <div class="hero-actions">
+              <button onclick="openAddJobModal()" class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 13px; background: #db2777;"><i class="fa-solid fa-bullhorn"></i> Buka Kuota Magang</button>
+            </div>
+          </div>
+
+          <!-- 4 Stat Cards Instansi -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px;">
+            <div class="summary-card">
+              <p class="summary-label">SISWA MAGANG AKTIF</p>
+              <h3 class="summary-value" style="color: #F472B6;">6</h3>
+              <p class="summary-caption">Siswa sedang berkegiatan di kantor</p>
+            </div>
+            <div class="summary-card">
+              <p class="summary-label">TALENTA SIAP KERJA</p>
+              <h3 class="summary-value" style="color: #34D399;">48</h3>
+              <p class="summary-caption">Portofolio lolos verifikasi guru</p>
+            </div>
+            <div class="summary-card">
+              <p class="summary-label">KUOTA MAGANG TERBUKA</p>
+              <h3 class="summary-value" style="color: #60A5FA;">10 Posisi</h3>
+              <p class="summary-caption">Tersedia untuk semester ini</p>
+            </div>
+            <div class="summary-card">
+              <p class="summary-label">STATUS MOU KEMITRAAN</p>
+              <h3 class="summary-value" style="color: #FBBF24; font-size: 1.25rem;">Aktif s/d 2027</h3>
+              <p class="summary-caption">Sekolah CDGS Partner</p>
+            </div>
+          </div>
+
+          <!-- Search & Filter Bar (FIND TALENT) -->
+          <div class="panel" style="margin-bottom: 20px;">
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;">
+              <div style="display: flex; gap: 10px; flex: 1; min-width: 280px;">
+                <div class="search-field" style="width: 100%; max-width: 360px;">
+                  <span class="search-icon" aria-hidden="true"></span>
+                  <input type="text" id="find-talent-search" placeholder="Cari keahlian (Web, UI/UX, Python, Mikrotik)..." oninput="filterTalents()">
+                </div>
+                <select id="find-talent-jurusan" onchange="filterTalents()" class="role-switcher-select" style="min-height: 36px;">
+                  <option value="">Semua Jurusan</option>
+                  <option value="RPL">Rekayasa Perangkat Lunak (RPL)</option>
+                  <option value="DKV">Desain Komunikasi Visual (DKV)</option>
+                  <option value="TKJ">Teknik Komputer & Jaringan (TKJ)</option>
                 </select>
               </div>
-              <div style="margin-bottom: 12px;">
-                <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">Contact Person (CP)</label>
-                <input type="text" id="partner-cp" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff; box-sizing: border-box;">
+              <span style="font-size: 12px; color: #9ca3af;" id="talent-count-label">Menampilkan 4 Talenta Siap Magang</span>
+            </div>
+          </div>
+
+          <!-- Grid Kartu Talenta Siswa -->
+          <div class="talent-grid" id="talent-card-grid">
+            <!-- Talent 1 -->
+            <div class="talent-card" data-skills="javascript nodejs postgresql web rpl fullstack">
+              <div class="talent-header">
+                <div class="talent-avatar" style="background: linear-gradient(135deg, #3B82F6, #1D4ED8);">MR</div>
+                <div class="talent-info">
+                  <h4>Muhammad Razan</h4>
+                  <p>SMK CDGS • Rekayasa Perangkat Lunak</p>
+                  <span class="role-badge badge-guru" style="margin-top: 4px;">⭐ Siap Magang / Kerja</span>
+                </div>
               </div>
-              <div style="margin-bottom: 20px;">
-                <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">No. Telepon / WA</label>
-                <input type="text" id="partner-phone" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff; box-sizing: border-box;">
+              <p style="font-size: 12px; color: #9ca3af; margin: 0 0 8px; line-height: 1.4;">
+                Fokus pengembangan backend & fullstack web application dengan Node.js dan database PostgreSQL. Telah menyelesaikan 4 proyek terverifikasi.
+              </p>
+              <div class="skill-tags">
+                <span class="skill-tag skill-tag-highlight">JavaScript</span>
+                <span class="skill-tag skill-tag-highlight">Node.js</span>
+                <span class="skill-tag">PostgreSQL</span>
+                <span class="skill-tag">REST API</span>
               </div>
-              <div style="margin-bottom: 12px;">
-                <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">Alamat Instansi</label>
-                <textarea id="partner-address" rows="2" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff; box-sizing: border-box; resize: vertical;"></textarea>
+              <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid #26334A; display: flex; gap: 8px;">
+                <button onclick="inviteTalent('Muhammad Razan', 'RPL')" class="btn-primary" style="font-size: 12px; padding: 6px 12px; background: #db2777;"><i class="fa-solid fa-paper-plane"></i> Undang Magang</button>
+                <button onclick="alert('Portofolio Muhammad Razan: Sistem Kasir Web POS & Manajemen Perpustakaan Sekolah')" class="btn-secondary" style="font-size: 12px; padding: 6px 10px; color: #fff; border-color: #384C6E;">Lihat Portofolio</button>
               </div>
-              <div style="display: flex; justify-content: flex-end; gap: 8px;">
-                <button type="button" onclick="closePartnerModal()" style="padding: 8px 16px; background: #4b5563; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Batal</button>
-                <button type="submit" style="padding: 8px 16px; background: #8b5cf6; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Simpan</button>
+            </div>
+
+            <!-- Talent 2 -->
+            <div class="talent-card" data-skills="ui/ux figma design dkv prototyping mobile">
+              <div class="talent-header">
+                <div class="talent-avatar" style="background: linear-gradient(135deg, #EC4899, #BE185D);">DL</div>
+                <div class="talent-info">
+                  <h4>Dewi Lestari</h4>
+                  <p>SMK CDGS • Desain Komunikasi Visual</p>
+                  <span class="role-badge badge-guru" style="margin-top: 4px;">⭐ Siap Magang / Kerja</span>
+                </div>
               </div>
-            </form>
+              <p style="font-size: 12px; color: #9ca3af; margin: 0 0 8px; line-height: 1.4;">
+                UI/UX Designer yang ahli membuat wireframe, user flow, hingga interactive prototype di Figma sesuai pedoman desain industri.
+              </p>
+              <div class="skill-tags">
+                <span class="skill-tag skill-tag-highlight">Figma</span>
+                <span class="skill-tag skill-tag-highlight">UI/UX</span>
+                <span class="skill-tag">Design System</span>
+                <span class="skill-tag">Mobile UI</span>
+              </div>
+              <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid #26334A; display: flex; gap: 8px;">
+                <button onclick="inviteTalent('Dewi Lestari', 'DKV')" class="btn-primary" style="font-size: 12px; padding: 6px 12px; background: #db2777;"><i class="fa-solid fa-paper-plane"></i> Undang Magang</button>
+                <button onclick="alert('Portofolio Dewi Lestari: Redesain Mobile App Portal Magang & Design System Sekolah')" class="btn-secondary" style="font-size: 12px; padding: 6px 10px; color: #fff; border-color: #384C6E;">Lihat Portofolio</button>
+              </div>
+            </div>
+
+            <!-- Talent 3 -->
+            <div class="talent-card" data-skills="network mikrotik linux tkj server vpn cisco">
+              <div class="talent-header">
+                <div class="talent-avatar" style="background: linear-gradient(135deg, #10B981, #047857);">FM</div>
+                <div class="talent-info">
+                  <h4>Farhan Maulana</h4>
+                  <p>SMK CDGS • Teknik Komputer & Jaringan</p>
+                  <span class="role-badge badge-guru" style="margin-top: 4px;">⭐ Siap Magang / Kerja</span>
+                </div>
+              </div>
+              <p style="font-size: 12px; color: #9ca3af; margin: 0 0 8px; line-height: 1.4;">
+                Memiliki sertifikasi Mikrotik MTCNA, berpengalaman mengonfigurasi jaringan router, VPN WireGuard, dan server Linux Ubuntu.
+              </p>
+              <div class="skill-tags">
+                <span class="skill-tag skill-tag-highlight">Mikrotik</span>
+                <span class="skill-tag skill-tag-highlight">Linux</span>
+                <span class="skill-tag">WireGuard VPN</span>
+                <span class="skill-tag">Nginx</span>
+              </div>
+              <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid #26334A; display: flex; gap: 8px;">
+                <button onclick="inviteTalent('Farhan Maulana', 'TKJ')" class="btn-primary" style="font-size: 12px; padding: 6px 12px; background: #db2777;"><i class="fa-solid fa-paper-plane"></i> Undang Magang</button>
+                <button onclick="alert('Portofolio Farhan Maulana: Infrastruktur Server Linux & Firewall VPN')" class="btn-secondary" style="font-size: 12px; padding: 6px 10px; color: #fff; border-color: #384C6E;">Lihat Portofolio</button>
+              </div>
+            </div>
+
+            <!-- Talent 4 -->
+            <div class="talent-card" data-skills="python data ai rpl machine learning sql">
+              <div class="talent-header">
+                <div class="talent-avatar" style="background: linear-gradient(135deg, #F59E0B, #B45309);">AR</div>
+                <div class="talent-info">
+                  <h4>Ahmad Rizqi</h4>
+                  <p>SMK CDGS • Rekayasa Perangkat Lunak</p>
+                  <span class="role-badge badge-guru" style="margin-top: 4px;">⭐ Juara LKS 2026</span>
+                </div>
+              </div>
+              <p style="font-size: 12px; color: #9ca3af; margin: 0 0 8px; line-height: 1.4;">
+                Juara 1 LKS Web Technologies 2026 tingkat provinsi. Mahir dalam arsitektur API microservice, frontend React/Vue, dan analisis data Python.
+              </p>
+              <div class="skill-tags">
+                <span class="skill-tag skill-tag-highlight">Web Tech</span>
+                <span class="skill-tag skill-tag-highlight">Python</span>
+                <span class="skill-tag">Vue.js</span>
+                <span class="skill-tag">PostgreSQL</span>
+              </div>
+              <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid #26334A; display: flex; gap: 8px;">
+                <button onclick="inviteTalent('Ahmad Rizqi', 'RPL')" class="btn-primary" style="font-size: 12px; padding: 6px 12px; background: #db2777;"><i class="fa-solid fa-paper-plane"></i> Undang Magang</button>
+                <button onclick="alert('Portofolio Ahmad Rizqi: Proyek Juara 1 LKS Web Tech & Smart Dashboard')" class="btn-secondary" style="font-size: 12px; padding: 6px 10px; color: #fff; border-color: #384C6E;">Lihat Portofolio</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODALS SECTION                                                        -->
+  <!-- ===================================================================== -->
+
+  <!-- 1. Modal Tambah Sekolah -->
+  <div id="school-modal" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-school"></i> Tambah Data Sekolah</h3>
+        <button type="button" class="modal-close-btn" onclick="closeSchoolModal()">&times;</button>
+      </div>
+      <form id="school-form" onsubmit="handleAddSchool(event)">
+        <div class="modal-body">
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">NPSN *</label>
+            <input type="text" id="school-npsn" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Nama Sekolah *</label>
+            <input type="text" id="school-name" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 12px;">
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Jenjang *</label>
+              <select id="school-level" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+                <option value="SMK">SMK</option>
+                <option value="SMA">SMA</option>
+                <option value="MA">MA</option>
+                <option value="SMP">SMP</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Status *</label>
+              <select id="school-status" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+                <option value="NEGERI">NEGERI</option>
+                <option value="SWASTA">SWASTA</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Akreditasi</label>
+            <select id="school-accreditation" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="Belum">Belum Terakreditasi</option>
+            </select>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Alamat</label>
+            <textarea id="school-address" rows="2" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;"></textarea>
           </div>
         </div>
-        <!-- ================= MODAL TAMBAH SEKOLAH ================= -->
-         <div id="school-content">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>NPSN</th>
-                <th>Nama Sekolah</th>
-                <th>Jenjang</th>
-                <th>Status</th>
-                <th>Akreditasi</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <!-- PASTIKAN ID INI ADA DAN SAMA PERSIS 👇 -->
-            <tbody id="schoolTableBody"></tbody>
-          </table>
+        <div class="modal-foot">
+          <button type="button" onclick="closeSchoolModal()" class="btn-secondary" style="width:auto; padding:6px 14px; border-color:#4b5563; color:#fff;">Batal</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:6px 16px; background:#2563eb;">Simpan Sekolah</button>
         </div>
-        <button onclick="openSchoolModal()" class="btn-primary">+ Tambah Sekolah</button> 
-        <div id="school-modal" class="modal" style="display: none;">
-          <div class="modal-content" style="background: #1f2937; color: #fff; padding: 20px; border-radius: 8px; max-width: 500px; margin: 50px auto; position: relative;">
-            
-            <!-- Tombol Close Modal -->
-            <button type="button" onclick="closeSchoolModal()" style="position: absolute; right: 15px; top: 15px; background: none; border: none; color: #aaa; font-size: 20px; cursor: pointer;">&times;</button>
-            
-            <h3 style="margin-top: 0; margin-bottom: 16px;">Tambah Data Sekolah</h3>
-
-            <!-- PASTE KODE LANGKAH 4 DI SINI -->
-            <form id="school-form" onsubmit="handleAddSchool(event)">
-              <div style="margin-bottom: 12px;">
-                <label style="display:block; font-size:12px; margin-bottom:4px;">NPSN *</label>
-                <input type="text" id="school-npsn" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
-              </div>
-
-              <div style="margin-bottom: 12px;">
-                <label style="display:block; font-size:12px; margin-bottom:4px;">Nama Sekolah *</label>
-                <input type="text" id="school-name" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
-              </div>
-
-              <div style="margin-bottom: 12px;">
-                <label style="display:block; font-size:12px; margin-bottom:4px;">Jenjang *</label>
-                <select id="school-level" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
-                  <option value="">-- Pilih Jenjang --</option>
-                  <option value="SMA">SMA</option>
-                  <option value="SMK">SMK</option>
-                  <option value="MA">MA</option>
-                  <option value="SMP">SMP</option>
-                </select>
-              </div>
-
-              <div style="margin-bottom: 12px;">
-                <label style="display:block; font-size:12px; margin-bottom:4px;">Status *</label>
-                <select id="school-status" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
-                  <option value="NEGERI">NEGERI</option>
-                  <option value="SWASTA">SWASTA</option>
-                </select>
-              </div>
-
-              <div style="margin-bottom: 12px;">
-                <label style="display:block; font-size:12px; margin-bottom:4px;">Akreditasi</label>
-                <select id="school-accreditation" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
-                  <option value="A">A</option>
-                  <option value="B">B</option>
-                  <option value="C">C</option>
-                  <option value="Belum">Belum Terakreditasi</option>
-                </select>
-              </div>
-
-              <div style="margin-bottom: 12px;">
-                <label style="display:block; font-size:12px; margin-bottom:4px;">Alamat Sekolah</label>
-                <textarea id="school-address" rows="2" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;"></textarea>
-              </div>
-              
-              <button type="submit" style="width:100%; padding:10px; background:#2563eb; color:#fff; border:none; border-radius:4px; cursor:pointer;">Simpan Sekolah</button>
-            </form>
-
+      </form>
     </div>
   </div>
 
-</main>
+  <!-- 2. Modal Edit Sekolah -->
+  <div id="modalEditSekolah" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-pen-to-square"></i> Edit Data Sekolah</h3>
+        <button type="button" class="modal-close-btn" onclick="closeEditSchoolModal()">&times;</button>
+      </div>
+      <form id="editSchoolForm">
+        <div class="modal-body">
+          <input type="hidden" id="editSchoolId">
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">NPSN *</label>
+            <input type="text" id="editNpsn" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Nama Sekolah *</label>
+            <input type="text" id="editName" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 12px;">
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Jenjang *</label>
+              <select id="editLevel" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+                <option value="SMK">SMK</option>
+                <option value="SMA">SMA</option>
+                <option value="MA">MA</option>
+                <option value="SMP">SMP</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Status *</label>
+              <select id="editStatus" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+                <option value="NEGERI">NEGERI</option>
+                <option value="SWASTA">SWASTA</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Akreditasi</label>
+            <input type="text" id="editAccreditation" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Alamat</label>
+            <textarea id="editAddress" rows="2" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;"></textarea>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" onclick="closeEditSchoolModal()" class="btn-secondary" style="width:auto; padding:6px 14px; border-color:#4b5563; color:#fff;">Batal</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:6px 16px; background:#f59e0b;">Simpan Perubahan</button>
+        </div>
+      </form>
     </div>
   </div>
 
+  <!-- 3. Modal Tambah Mitra -->
+  <div id="partner-modal" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-handshake"></i> Tambah Mitra Baru</h3>
+        <button type="button" class="modal-close-btn" onclick="closePartnerModal()">&times;</button>
+      </div>
+      <form id="partner-form">
+        <div class="modal-body">
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">Nama Instansi / Perusahaan *</label>
+            <input type="text" id="partner-name" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff;">
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">Kategori *</label>
+            <select id="partner-category" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff;">
+              <option value="DUDI">DUDI (Dunia Usaha / Industri)</option>
+              <option value="PTN">PTN (Perguruan Tinggi Negeri)</option>
+              <option value="PTS">PTS (Perguruan Tinggi Swasta)</option>
+            </select>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 12px;">
+            <div>
+              <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">Contact Person (CP)</label>
+              <input type="text" id="partner-cp" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">No. Telepon / WA</label>
+              <input type="text" id="partner-phone" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff;">
+            </div>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">Alamat Instansi</label>
+            <textarea id="partner-address" rows="2" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff;"></textarea>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" onclick="closePartnerModal()" class="btn-secondary" style="width:auto; padding:6px 14px; border-color:#4b5563; color:#fff;">Batal</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:6px 16px; background:#8b5cf6;">Simpan Mitra</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Modal Edit Mitra -->
+  <div id="modalEditMitra" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-pen-to-square"></i> Edit Data Mitra</h3>
+        <button type="button" class="modal-close-btn" onclick="closeEditPartnerModal()">&times;</button>
+      </div>
+      <form id="editPartnerForm" onsubmit="handleUpdatePartner(event)">
+        <div class="modal-body">
+          <input type="hidden" id="editPartnerId">
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">Nama Instansi *</label>
+            <input type="text" class="form-control" id="editPartnerName" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff;">
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">Kategori *</label>
+            <select class="form-select" id="editPartnerCategory" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff;">
+              <option value="DUDI">DUDI</option>
+              <option value="PTN">PTN</option>
+              <option value="PTS">PTS</option>
+            </select>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 12px;">
+            <div>
+              <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">Kontak (CP)</label>
+              <input type="text" class="form-control" id="editPartnerContact" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 12px; margin-bottom: 4px; color: #9ca3af;">Telepon</label>
+              <input type="text" class="form-control" id="editPartnerPhone" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4b5563; background: #374151; color: #fff;">
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" onclick="closeEditPartnerModal()" class="btn-secondary" style="width:auto; padding:6px 14px; border-color:#4b5563; color:#fff;">Batal</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:6px 16px; background:#8b5cf6;">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Modal Tambah Portofolio (Murid) -->
+  <div id="add-portfolio-modal" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-cloud-arrow-up"></i> Unggah Portofolio Proyek Baru</h3>
+        <button type="button" class="modal-close-btn" onclick="closeAddPortfolioModal()">&times;</button>
+      </div>
+      <form id="portfolio-form" onsubmit="handleCreatePortfolio(event)">
+        <div class="modal-body">
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Judul Karya / Proyek *</label>
+            <input type="text" id="portfolio-title" required placeholder="Contoh: Aplikasi Monitoring IoT Suhu" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 12px;">
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Kategori *</label>
+              <select id="portfolio-category" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+                <option value="Web App">Web Application</option>
+                <option value="Mobile App">Mobile Application</option>
+                <option value="UI/UX Design">UI/UX Design</option>
+                <option value="Jaringan & Server">Jaringan & Server</option>
+                <option value="IoT & Hardware">IoT & Hardware</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Link Demo / GitHub</label>
+              <input type="text" id="portfolio-link" placeholder="https://..." style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+            </div>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Keahlian / Tech Stack Digunakan *</label>
+            <input type="text" id="portfolio-skills" required placeholder="Contoh: Python, Flask, MQTT, PostgreSQL" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Deskripsi Singkat Karya *</label>
+            <textarea id="portfolio-desc" rows="3" required placeholder="Jelaskan fitur utama, peran kamu dalam tim, dan masalah yang dipecahkan..." style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;"></textarea>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" onclick="closeAddPortfolioModal()" class="btn-secondary" style="width:auto; padding:6px 14px; border-color:#4b5563; color:#fff;">Batal</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:6px 16px; background:#d97706;">Kirim untuk Validasi Guru</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6. Modal Undang Magang (Instansi) -->
+  <div id="invite-talent-modal" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-paper-plane"></i> Kirim Undangan Magang / Wawancara</h3>
+        <button type="button" class="modal-close-btn" onclick="closeInviteModal()">&times;</button>
+      </div>
+      <form onsubmit="handleSendInvitation(event)">
+        <div class="modal-body">
+          <p style="color:#9ca3af; font-size:13px; margin-bottom:12px;">
+            Mengirimkan undangan resmi program magang kepada: <strong id="invite-student-name" style="color:#fff;">-</strong>
+          </p>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Posisi / Peran Magang *</label>
+            <input type="text" id="invite-position" required value="Junior Software Developer Intern" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Pesan Undangan / Catatan Tambahan</label>
+            <textarea id="invite-notes" rows="3" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">Halo, kami sangat terkesan dengan portofolio karyamu di platform CDGS. Kami ingin mengundangmu untuk tahap wawancara program magang industri kami.</textarea>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" onclick="closeInviteModal()" class="btn-secondary" style="width:auto; padding:6px 14px; border-color:#4b5563; color:#fff;">Batal</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:6px 16px; background:#db2777;">Kirim Undangan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/auth.js"></script>
   <script src="/js/dashboard.js"></script>
-  <script>
-    document.getElementById('logout-btn').addEventListener('click', () => {
-      window.auth.logout();
-    });
-  </script>
-  
-
 </body>
 </html>

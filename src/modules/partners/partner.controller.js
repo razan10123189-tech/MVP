@@ -56,6 +56,48 @@ async function createPartner(req, res) {
   }
 }
 
+async function updatePartner(req, res) {
+  const { id } = req.params;
+  const { name, category, contact_person, phone } = req.body;
+
+  if (!name || !category) {
+    return res.status(400).json({
+      success: false,
+      message: 'Nama Instansi dan Kategori wajib diisi'
+    });
+  }
+
+  try {
+    const query = `
+      UPDATE partners
+      SET name = $1, category = $2, contact_person = $3, phone = $4
+      WHERE id = $5
+      RETURNING *;
+    `;
+    const values = [name, category, contact_person, phone, id];
+    const result = await db.query(query, values); // Sesuaikan 'db' atau 'pool' dengan file kamu
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Data mitra tidak ditemukan'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Data mitra berhasil diperbarui',
+      data: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error update partner:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memperbarui data mitra',
+      error: error.message
+    });
+  }
+}
 // 3. Delete Partner
 async function deletePartner(req, res) {
   const { id } = req.params;
@@ -78,5 +120,6 @@ async function deletePartner(req, res) {
 module.exports = {
   getPartners,
   createPartner,
-  deletePartner
+  deletePartner,
+  updatePartner
 };

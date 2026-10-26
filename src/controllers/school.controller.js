@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const pool = require('../config/database');
 
+
 /**
  * 1. Tambah Data Sekolah Baru (POST)
  */
@@ -112,9 +113,38 @@ async function deleteSchool(req, res) {
   }
 }
 
+const updateSchool = async (req, res) => {
+  const { id } = req.params;
+  const { npsn, name, level, status, accreditation, address } = req.body;
+
+  try {
+    const query = `
+      UPDATE schools
+      SET npsn = $1, name = $2, level = $3, status = $4, accreditation = $5, address = $6
+      WHERE id = $7
+      RETURNING *;
+    `;
+    const values = [npsn, name, level, status, accreditation, address, id];
+    const result = await db.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ success: false, message: 'Sekolah tidak ditemukan' });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Data sekolah berhasil diperbarui',
+      data: result.rows[0]
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Gagal memperbarui data sekolah', error: error.message });
+  }
+};
+
 // Eksport ketiga fungsi agar dapat diakses oleh school.router.js
 module.exports = {
   createSchool,
   getSchools,
-  deleteSchool
+  deleteSchool,
+  updateSchool
 };
