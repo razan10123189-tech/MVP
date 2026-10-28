@@ -116,10 +116,110 @@ async function deletePartner(req, res) {
   }
 }
 
+// 4. Kirim Undangan Magang / Wawancara ke Siswa Talenta
+async function sendInvitation(req, res) {
+  const { student_name, student_major, position, notes, partner_name } = req.body;
+
+  if (!student_name || !position) {
+    return res.status(400).json({
+      success: false,
+      message: 'Nama siswa dan posisi magang wajib diisi'
+    });
+  }
+
+  try {
+    // Cari user_id siswa berdasarkan nama atau fallback ke akun demo murid
+    let studentId = null;
+    const studentLookup = await pool.query(`
+      SELECT u.id 
+      FROM users u
+      LEFT JOIN students_profile sp ON sp.user_id = u.id
+      WHERE sp.full_name ILIKE $1 OR u.email ILIKE $1
+      LIMIT 1
+    `, [`%${student_name.trim()}%`]);
+
+    if (studentLookup.rows.length > 0) {
+      studentId = studentLookup.rows[0].id;
+    } else {
+      const fallbackMurid = await pool.query("SELECT id FROM users WHERE email = 'murid@cdgs.local'");
+      studentId = fallbackMurid.rows[0]?.id || null;
+    }
+
+    // Tentukan data partner pengirim
+    let partnerId = null;
+    let finalPartnerName = partner_name || 'PT Telkom Indonesia';
+    const partnerLookup = await pool.query("SELECT id, name FROM partners WHERE name ILIKE $1 LIMIT 1", [`%${finalPartnerName}%`]);
+    if (partnerLookup.rows.length > 0) {
+      partnerId = partnerLookup.rows[0].id;
+      finalPartnerName = partnerLookup.rows[0].name;
+    } else {
+      const anyPartner = await pool.query("SELECT id, name FROM partners WHERE category = 'DUDI' LIMIT 1");
+      if (anyPartner.rows.length > 0) {
+        partnerId = anyPartner.rows[0].id;
+        finalPartnerName = anyPartner.rows[0].name;
+      }
+    }
+
+    const query = `
+      INSERT INTO internship_invitations (id, student_id, student_name, student_major, partner_id, partner_name, position, notes, status, created_at)
+      VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, 'PENDING', NOW())
+      RETURNING *;
+    `;
+    const result = await pool.query(query, [
+      studentId,
+      student_name,
+      student_major || 'Rekayasa Perangkat Lunak',
+      partnerId,
+      finalPartnerName,
+      position,
+      notes || 'Kami mengundang Anda untuk mengikuti proses wawancara dan program magang industri di perusahaan kami.'
+    ]);
+
+    return res.status(201).json({
+      success: true,
+      message: `Undangan magang untuk posisi "${position}" berhasil dikirim ke ${student_name} dan masuk ke akun siswa!`,
+      data: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error sendInvitation:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mengirimkan undangan magang',
+      error: error.message
+    });
+  }
+}
+
+// 5. Ambil Daftar Undangan Terkirim (Untuk Instansi)
+async function getPartnerInvitations(req, res) {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        inv.*,
+        to_char(inv.created_at, 'DD Mon YYYY, HH24:MI') as created_at_fmt
+      FROM internship_invitations inv
+      ORDER BY inv.created_at DESC
+    `);
+    return res.status(200).json({
+      success: true,
+      data: result.rows
+    });
+  } catch (error) {
+    console.error('Error getPartnerInvitations:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil daftar undangan',
+      error: error.message
+    });
+  }
+}
+
 // EXPORT HARUS DI PALING BAWAH
 module.exports = {
   getPartners,
   createPartner,
   deletePartner,
-  updatePartner
+  updatePartner,
+  sendInvitation,
+  getPartnerInvitations
 };

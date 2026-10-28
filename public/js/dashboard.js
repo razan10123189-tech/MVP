@@ -138,7 +138,7 @@ function setDashboardRole(role) {
     if (v) v.style.display = 'block';
 
     renderSidebarLinks('kepsek');
-    initKepsekTalentChart();
+    initKepsekDashboard();
 
   } else if (role === 'Guru') {
     if (badgeEl) badgeEl.classList.add('badge-guru');
@@ -162,6 +162,7 @@ function setDashboardRole(role) {
     if (v) v.style.display = 'block';
 
     renderSidebarLinks('murid');
+    initMuridDashboard();
 
   } else if (role === 'Instansi') {
     if (badgeEl) badgeEl.classList.add('badge-instansi');
@@ -173,6 +174,7 @@ function setDashboardRole(role) {
     if (v) v.style.display = 'block';
 
     renderSidebarLinks('instansi');
+    loadInstansiInvitations();
 
   } else {
     // Platform Admin (Default)
@@ -217,14 +219,17 @@ function renderSidebarLinks(roleKey) {
     ];
   } else if (roleKey === 'murid') {
     links = [
-      { icon: 'fa-solid fa-user-astronaut', label: 'Profil Talenta Saya', active: true, onclick: "setDashboardRole('Murid')" },
-      { icon: 'fa-solid fa-folder-open', label: 'Portofolio & Proyek', onclick: "openAddPortfolioModal()" },
-      { icon: 'fa-solid fa-certificate', label: 'Lencana Keahlian', onclick: "alert('Daftar lencana kompetensi terverifikasi guru.')" },
-      { icon: 'fa-solid fa-bullhorn', label: 'Peluang Magang DUDI', onclick: "alert('Menampilkan 8 lowongan magang mitra industri yang relevan.')" }
+      { icon: 'fa-solid fa-folder-open', label: 'Portofolio Proyek', active: true, onclick: "switchMuridTab('portfolios')" },
+      { icon: 'fa-solid fa-certificate', label: 'Lencana Keahlian', onclick: "switchMuridTab('badges')" },
+      { icon: 'fa-solid fa-briefcase', label: 'Status PKL & Bimbingan', onclick: "switchMuridTab('pkl')" },
+      { icon: 'fa-solid fa-bullhorn', label: 'Peluang Magang DUDI', onclick: "switchMuridTab('vacancies')" },
+      { icon: 'fa-solid fa-envelope-open-text', label: 'Undangan Magang', onclick: "switchMuridTab('invitations')" },
+      { icon: 'fa-solid fa-file-invoice', label: 'Cetak CV / Resume', onclick: "openMuridResumeModal()" }
     ];
   } else if (roleKey === 'instansi') {
     links = [
       { icon: 'fa-solid fa-magnifying-glass', label: 'Find Talent', active: true, onclick: "setDashboardRole('Instansi')" },
+      { icon: 'fa-solid fa-paper-plane', label: 'Undangan Terkirim', onclick: "document.getElementById('instansi-invitations-list')?.scrollIntoView({behavior:'smooth'})" },
       { icon: 'fa-solid fa-briefcase', label: 'Program Magang', onclick: "openAddJobModal()" },
       { icon: 'fa-solid fa-user-check', label: 'Siswa Magang Aktif', onclick: "alert('6 Siswa sedang magang aktif di instansi Anda.')" },
       { icon: 'fa-solid fa-file-contract', label: 'MoU Kemitraan', onclick: "alert('Status MoU aktif dengan sekolah CDGS terhubung.')" }
@@ -292,20 +297,24 @@ function initTenantDomainChart() {
   });
 }
 
-function initKepsekTalentChart() {
+function initKepsekTalentChart(labels, data) {
   const ctx = document.getElementById('kepsekTalentChart');
   if (!ctx || !window.Chart) return;
 
   if (kepsekChartInstance) kepsekChartInstance.destroy();
 
+  const chartLabels = labels && labels.length ? labels : ['(Belum ada data)'];
+  const chartData   = data   && data.length   ? data   : [0];
+  const colors = ['#3B82F6', '#EC4899', '#10B981', '#F59E0B', '#A78BFA', '#F472B6', '#34D399', '#60A5FA'];
+
   kepsekChartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['Rekayasa Software', 'Desain Visual (DKV)', 'Jaringan & Cyber', 'Multimedia / Game'],
+      labels: chartLabels,
       datasets: [{
-        label: 'Siswa Tersertifikasi',
-        data: [142, 98, 86, 64],
-        backgroundColor: ['#3B82F6', '#EC4899', '#10B981', '#F59E0B'],
+        label: 'Jumlah Siswa',
+        data: chartData,
+        backgroundColor: chartLabels.map((_, i) => colors[i % colors.length]),
         borderRadius: 4,
         barThickness: 28
       }]
@@ -316,10 +325,263 @@ function initKepsekTalentChart() {
       plugins: { legend: { display: false } },
       scales: {
         x: { ticks: { color: '#9ca3af', font: { size: 11 } }, grid: { display: false } },
-        y: { beginAtZero: true, ticks: { color: '#9ca3af', stepSize: 30 }, grid: { color: '#26334A' } }
+        y: { beginAtZero: true, ticks: { color: '#9ca3af', stepSize: 10 }, grid: { color: '#26334A' } }
       }
     }
   });
+}
+
+// ============================================================================
+// KEPSEK DASHBOARD — FUNGSI UTAMA
+// ============================================================================
+
+/**
+ * Entry point: dipanggil setiap kali role Kepala Sekolah diaktifkan.
+ * Memanggil semua load function paralel.
+ */
+async function initKepsekDashboard() {
+  await Promise.allSettled([
+    loadKepsekStats(),
+    loadKepsekTalents(),
+    loadKepsekMou(),
+    loadKepsekKpi(),
+    loadKepsekTeachers()
+  ]);
+}
+
+/** Switch tab dalam view kepsek */
+function switchKepsekTab(tabKey, btnEl) {
+  document.querySelectorAll('.kepsek-tab-content').forEach(el => el.style.display = 'none');
+  const target = document.getElementById('kepsek-tab-' + tabKey);
+  if (target) target.style.display = 'block';
+
+  document.querySelectorAll('#kepsek-nav-pills .nav-pill').forEach(b => b.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
+}
+
+/** Muat statistik ringkasan eksekutif */
+async function loadKepsekStats() {
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('/api/v1/kepsek/stats', {
+      headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+    });
+    const result = await res.json();
+    if (!result.success) return;
+    const d = result.data;
+
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('stat-kepsek-students', d.total_active_students ?? '—');
+    set('stat-kepsek-portfolios', d.verified_portfolios ?? '—');
+    set('stat-kepsek-partners', d.active_partners ?? '—');
+    set('stat-kepsek-pkl', d.pkl_placements ?? '—');
+    set('stat-kepsek-guidance', d.guidance_sessions ?? '—');
+    set('stat-kepsek-total-porto', d.total_portfolios ?? '—');
+
+    // Hitung tingkat verifikasi
+    const total = d.total_portfolios || 0;
+    const verified = d.verified_portfolios || 0;
+    const rate = total > 0 ? ((verified / total) * 100).toFixed(0) + '%' : '—';
+    set('stat-kepsek-verify-rate', rate);
+
+    // Muat chart distribusi talenta
+    await loadKepsekTalentDistribution();
+  } catch (err) {
+    console.error('[Kepsek] loadKepsekStats error:', err);
+  }
+}
+
+/** Muat distribusi talenta per jurusan untuk chart */
+async function loadKepsekTalentDistribution() {
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('/api/v1/kepsek/talent-distribution', {
+      headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+    });
+    const result = await res.json();
+    if (!result.success) {
+      initKepsekTalentChart(); // render kosong
+      return;
+    }
+    const labels = result.data.map(d => d.label);
+    const values = result.data.map(d => d.value);
+    initKepsekTalentChart(labels, values);
+  } catch (err) {
+    console.error('[Kepsek] loadKepsekTalentDistribution error:', err);
+    initKepsekTalentChart();
+  }
+}
+
+/** Muat daftar talenta unggulan (top students) */
+async function loadKepsekTalents() {
+  const tbody = document.getElementById('kepsek-talents-tbody');
+  if (!tbody) return;
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('/api/v1/kepsek/top-talents', {
+      headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+    });
+    const result = await res.json();
+    if (!result.success || !result.data.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#9ca3af;">Belum ada data talenta unggulan.</td></tr>';
+      return;
+    }
+    const readyLabel = {
+      'siap': '<span class="portfolio-badge-verified">⭐ Siap Kerja</span>',
+      'proses': '<span class="portfolio-badge-pending">🔄 Dalam Proses</span>',
+    };
+    tbody.innerHTML = result.data.map(s => {
+      const level = (s.readiness_level || '').toLowerCase();
+      const badge = readyLabel[level] || `<span style="color:#9ca3af;font-size:12px;">${s.readiness_level || '—'}</span>`;
+      return `<tr style="border-bottom:1px solid #1E293B;">
+        <td style="padding:10px;font-weight:600;">${s.full_name}</td>
+        <td style="padding:10px;color:#9ca3af;font-size:12px;">${s.nis || '—'}</td>
+        <td style="padding:10px;color:#9ca3af;">${s.class_name || '—'} ${s.major ? '/ ' + s.major : ''}</td>
+        <td style="padding:10px;color:#34D399;font-weight:700;">${s.verified_portfolios ?? 0}</td>
+        <td style="padding:10px;color:#93C5FD;">${s.pkl_partner || '—'}</td>
+        <td style="padding:10px;">${badge}</td>
+      </tr>`;
+    }).join('');
+  } catch (err) {
+    console.error('[Kepsek] loadKepsekTalents error:', err);
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#ef4444;">Gagal memuat data talenta.</td></tr>';
+  }
+}
+
+/** Muat daftar MoU kemitraan */
+async function loadKepsekMou() {
+  const tbody = document.getElementById('kepsek-mou-tbody');
+  if (!tbody) return;
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('/api/v1/kepsek/mou', {
+      headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+    });
+    const result = await res.json();
+    if (!result.success || !result.data.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#9ca3af;">Belum ada data MoU.</td></tr>';
+      return;
+    }
+    const statusStyle = {
+      active:      'color:#34D399;font-weight:600;',
+      near_expiry: 'color:#FBBF24;font-weight:600;',
+      expired:     'color:#EF4444;font-weight:600;',
+      inactive:    'color:#9ca3af;'
+    };
+    const statusLabel = { active: 'Aktif', near_expiry: 'Hampir Habis', expired: 'Kedaluwarsa', inactive: 'Tidak Aktif' };
+    const fmt = (d) => d ? new Date(d).toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+    tbody.innerHTML = result.data.map(m => {
+      const cs = m.computed_status || 'inactive';
+      return `<tr style="border-bottom:1px solid #1E293B;">
+        <td style="padding:10px;font-weight:600;">${m.name}</td>
+        <td style="padding:10px;color:#9ca3af;">${m.category || '—'}</td>
+        <td style="padding:10px;font-size:12px;color:#A78BFA;">${m.mou_number || '—'}</td>
+        <td style="padding:10px;font-size:12px;color:#9ca3af;">${fmt(m.mou_start)} – ${fmt(m.mou_end)}</td>
+        <td style="padding:10px;"><span style="${statusStyle[cs] || ''}">${statusLabel[cs] || cs}</span></td>
+        <td style="padding:10px;color:#9ca3af;font-size:12px;">${m.contact_person || '—'}</td>
+      </tr>`;
+    }).join('');
+  } catch (err) {
+    console.error('[Kepsek] loadKepsekMou error:', err);
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#ef4444;">Gagal memuat data MoU.</td></tr>';
+  }
+}
+
+/** Muat target KPI sekolah */
+async function loadKepsekKpi() {
+  const container = document.getElementById('kepsek-kpi-list');
+  if (!container) return;
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('/api/v1/kepsek/targets', {
+      headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+    });
+    const result = await res.json();
+    if (!result.success || !result.data.length) {
+      container.innerHTML = '<p style="color:#9ca3af;font-size:13px;text-align:center;padding:20px;">Belum ada data target KPI. Hubungi admin untuk menambahkan indikator mutu.</p>';
+      return;
+    }
+    container.innerHTML = result.data.map(t => {
+      const pct = t.achievement_pct !== null ? t.achievement_pct : null;
+      const barColor = pct === null ? '#374151' : pct >= 100 ? '#34D399' : pct >= 75 ? '#FBBF24' : '#EF4444';
+      const pctText = pct !== null ? pct + '%' : '—';
+      const realizationText = t.realization !== null ? `${t.realization} ${t.target_unit || ''}` : '—';
+      return `<div style="background:#18243A;padding:14px 16px;border-radius:8px;border-left:4px solid ${barColor}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:13px;font-weight:600;color:#f3f4f6;">${t.indicator_name}</span>
+          <span style="font-size:12px;color:#9ca3af;">${t.academic_year || ''} ${t.semester ? '/ Sem. ' + t.semester : ''}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;background:#0F172A;border-radius:4px;height:8px;overflow:hidden;">
+            <div style="width:${Math.min(pct ?? 0, 100)}%;height:8px;background:${barColor};border-radius:4px;transition:width 0.4s;"></div>
+          </div>
+          <span style="font-size:13px;font-weight:700;color:${barColor};min-width:38px;text-align:right;">${pctText}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:#9ca3af;">
+          <span>Realisasi: <strong style="color:#f3f4f6;">${realizationText}</strong></span>
+          <span>Target: <strong style="color:#f3f4f6;">${t.target_value} ${t.target_unit || ''}</strong></span>
+        </div>
+        ${t.notes ? `<p style="font-size:11px;color:#6B7280;margin:6px 0 0;">${t.notes}</p>` : ''}
+      </div>`;
+    }).join('');
+  } catch (err) {
+    console.error('[Kepsek] loadKepsekKpi error:', err);
+    if (container) container.innerHTML = '<p style="color:#ef4444;font-size:13px;text-align:center;">Gagal memuat data KPI.</p>';
+  }
+}
+
+/** Muat rekap kinerja guru pembimbing */
+async function loadKepsekTeachers() {
+  const tbody = document.getElementById('kepsek-teachers-tbody');
+  if (!tbody) return;
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('/api/v1/kepsek/teacher-summary', {
+      headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+    });
+    const result = await res.json();
+    if (!result.success || !result.data.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#9ca3af;">Belum ada data sesi bimbingan guru.</td></tr>';
+      return;
+    }
+    const fmt = (d) => d ? new Date(d).toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+    tbody.innerHTML = result.data.map((t, idx) => {
+      const rankColor = idx === 0 ? '#FBBF24' : idx === 1 ? '#9ca3af' : idx === 2 ? '#F59E0B' : '#f3f4f6';
+      return `<tr style="border-bottom:1px solid #1E293B;">
+        <td style="padding:10px;font-weight:600;color:${rankColor};">${idx < 3 ? ['🥇','🥈','🥉'][idx] + ' ' : ''}${t.teacher_name}</td>
+        <td style="padding:10px;color:#60A5FA;font-weight:700;">${t.total_sessions}</td>
+        <td style="padding:10px;color:#34D399;">${t.students_guided}</td>
+        <td style="padding:10px;color:#9ca3af;font-size:12px;">${fmt(t.last_active)}</td>
+      </tr>`;
+    }).join('');
+  } catch (err) {
+    console.error('[Kepsek] loadKepsekTeachers error:', err);
+    if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#ef4444;">Gagal memuat data guru.</td></tr>';
+  }
+}
+
+/** Unduh laporan eksekutif sebagai JSON */
+async function downloadExecutiveReport() {
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('/api/v1/kepsek/report-data', {
+      headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+    });
+    const result = await res.json();
+    if (!result.success) { alert('Gagal mengambil data laporan.'); return; }
+
+    const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const now = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `laporan-kepsek-${now}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error('[Kepsek] downloadExecutiveReport error:', err);
+    alert('Gagal mengunduh laporan eksekutif.');
+  }
 }
 
 // ============================================================================
@@ -1614,8 +1876,302 @@ function closeGuruReportModal() {
 }
 
 // ============================================================================
-// 7. MURID WORKFLOW (Unggah Portofolio)
+// 7. MURID WORKFLOW (Ruang Talenta Siswa, Portofolio, Badges, PKL & Vacancies)
 // ============================================================================
+let muridProfileData = null;
+let muridPortfoliosData = [];
+let muridBadgesData = [];
+let muridPKLData = null;
+let muridGuidanceData = [];
+let muridVacanciesData = [];
+let muridInvitationsData = [];
+
+function switchMuridTab(tabKey, btnEl) {
+  const tabs = ['portfolios', 'badges', 'pkl', 'vacancies', 'invitations'];
+  tabs.forEach(t => {
+    const content = document.getElementById(`murid-tab-${t}`);
+    const btn = document.getElementById(`btn-murid-tab-${t}`);
+    if (content) content.style.display = (t === tabKey ? 'block' : 'none');
+    if (btn) {
+      if (t === tabKey) btn.classList.add('active');
+      else btn.classList.remove('active');
+    }
+  });
+  if (tabKey === 'invitations') {
+    loadMuridInvitations();
+  }
+}
+
+function initMuridDashboard() {
+  loadMuridProfile();
+  loadMuridStats();
+  loadMuridPortfolios();
+  loadMuridBadges();
+  loadMuridPKL();
+  loadMuridGuidance();
+  loadMuridVacancies();
+  loadMuridInvitations();
+}
+
+// 7.1 Profil Siswa
+async function loadMuridProfile() {
+  try {
+    const res = await window.api.fetch('/murid/profile');
+    const result = await res.json();
+    if (result.success && result.data) {
+      const p = result.data;
+      muridProfileData = p;
+
+      // Initials Avatar
+      const avatarEl = document.getElementById('murid-avatar-circle');
+      if (avatarEl) {
+        const initials = (p.full_name || 'Murid')
+          .split(' ')
+          .filter(Boolean)
+          .map(w => w[0])
+          .slice(0, 2)
+          .join('')
+          .toUpperCase();
+        avatarEl.textContent = initials || 'MR';
+      }
+
+      const nameEl = document.getElementById('murid-profile-name');
+      if (nameEl) nameEl.textContent = p.full_name;
+
+      const metaEl = document.getElementById('murid-profile-meta');
+      if (metaEl) {
+        metaEl.textContent = `NISN: ${p.nisn || '-'} • ${p.class_name || 'XII RPL 1'} • ${p.major || 'Rekayasa Perangkat Lunak'}`;
+      }
+
+      const mentorEl = document.getElementById('murid-mentor-name');
+      if (mentorEl) {
+        mentorEl.textContent = p.mentor_email ? `Guru (${p.mentor_email})` : 'Bpk. Budi Santoso';
+      }
+
+      const statusBox = document.getElementById('murid-profile-badge-box');
+      if (statusBox) {
+        if (p.is_recommended) {
+          statusBox.innerHTML = '<span class="role-badge badge-murid">⭐ Direkomendasikan Guru ke Industri</span>';
+        } else {
+          statusBox.innerHTML = '<span class="role-badge" style="background:#1E293B; color:#9ca3af; border:1px solid #374151;">📚 Proses Pembinaan & Bimbingan</span>';
+        }
+      }
+
+      const skillsBox = document.getElementById('murid-profile-skills-tags');
+      if (skillsBox) {
+        const skillsArr = (p.skills || '').split(',').map(s => s.trim()).filter(Boolean);
+        if (skillsArr.length === 0) {
+          skillsBox.innerHTML = '<span style="color:#6b7280; font-size:11px;">Belum ada keahlian ditambahkan.</span>';
+        } else {
+          skillsBox.innerHTML = skillsArr
+            .map((s, idx) => `<span class="skill-tag ${idx < 2 ? 'skill-tag-highlight' : ''}">${escapeHtml(s)}</span>`)
+            .join('');
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Error loadMuridProfile:', err);
+  }
+}
+
+function openEditStudentProfileModal() {
+  if (muridProfileData) {
+    const nameInput = document.getElementById('edit-student-name');
+    const nisnInput = document.getElementById('edit-student-nisn');
+    const classInput = document.getElementById('edit-student-class');
+    const majorInput = document.getElementById('edit-student-major');
+    const skillsInput = document.getElementById('edit-student-skills');
+
+    if (nameInput) nameInput.value = muridProfileData.full_name || '';
+    if (nisnInput) nisnInput.value = muridProfileData.nisn || '';
+    if (classInput) classInput.value = muridProfileData.class_name || '';
+    if (majorInput) majorInput.value = muridProfileData.major || '';
+    if (skillsInput) skillsInput.value = muridProfileData.skills || '';
+  }
+  const modal = document.getElementById('modalEditStudentProfile');
+  if (modal) modal.classList.add('active');
+}
+
+function closeEditStudentProfileModal() {
+  const modal = document.getElementById('modalEditStudentProfile');
+  if (modal) modal.classList.remove('active');
+}
+
+async function handleUpdateStudentProfile(e) {
+  e.preventDefault();
+  const full_name = document.getElementById('edit-student-name').value;
+  const nisn = document.getElementById('edit-student-nisn').value;
+  const class_name = document.getElementById('edit-student-class').value;
+  const major = document.getElementById('edit-student-major').value;
+  const skills = document.getElementById('edit-student-skills').value;
+
+  try {
+    const res = await window.api.fetch('/murid/profile', {
+      method: 'PUT',
+      body: JSON.stringify({ full_name, nisn, class_name, major, skills })
+    });
+    const result = await res.json();
+    if (result.success) {
+      alert('✅ Profil dan daftar keahlian talenta berhasil diperbarui!');
+      closeEditStudentProfileModal();
+      loadMuridProfile();
+    } else {
+      alert(result.message || 'Gagal memperbarui profil');
+    }
+  } catch (err) {
+    console.error('Error update student profile:', err);
+    alert('Terjadi kesalahan koneksi.');
+  }
+}
+
+// 7.2 Quick Stats Murid
+async function loadMuridStats() {
+  try {
+    const res = await window.api.fetch('/murid/stats');
+    const result = await res.json();
+    if (result.success && result.data) {
+      const s = result.data;
+      const totalEl = document.getElementById('stat-murid-total');
+      const totalSub = document.getElementById('stat-murid-portfolio-sub');
+      const readinessEl = document.getElementById('stat-murid-readiness');
+      const badgesEl = document.getElementById('stat-murid-badges');
+      const vacanciesEl = document.getElementById('stat-murid-vacancies');
+
+      if (totalEl) totalEl.textContent = s.total_portfolios;
+      if (totalSub) totalSub.textContent = `${s.verified_count} Disetujui • ${s.pending_count} Menunggu • ${s.revision_count} Revisi`;
+      if (readinessEl) readinessEl.innerHTML = `${s.readiness_score} <small style="font-size: 12px; color: #8F9DB4;">/ 100</small>`;
+      if (badgesEl) badgesEl.textContent = `${s.badge_count} Lencana`;
+      if (vacanciesEl) vacanciesEl.textContent = `${s.available_vacancies} Posisi`;
+
+      // Update badge di pills
+      const pTabBadge = document.getElementById('murid-portfolios-tab-badge');
+      if (pTabBadge) pTabBadge.textContent = s.total_portfolios;
+
+      const bTabBadge = document.getElementById('murid-badges-tab-badge');
+      if (bTabBadge) bTabBadge.textContent = s.badge_count;
+
+      const vTabBadge = document.getElementById('murid-vacancies-tab-badge');
+      if (vTabBadge) vTabBadge.textContent = s.available_vacancies;
+    }
+  } catch (err) {
+    console.error('Error loadMuridStats:', err);
+  }
+}
+
+// 7.3 Portofolio Siswa (CRUD)
+async function loadMuridPortfolios() {
+  const grid = document.getElementById('murid-portfolio-grid');
+  if (!grid) return;
+
+  try {
+    const res = await window.api.fetch('/murid/portfolios');
+    const result = await res.json();
+    if (result.success && Array.isArray(result.data)) {
+      muridPortfoliosData = result.data;
+      renderMuridPortfolios(muridPortfoliosData);
+    }
+  } catch (err) {
+    console.error('Error loadMuridPortfolios:', err);
+    grid.innerHTML = '<div style="color:#ef4444; padding:20px; text-align:center;">Gagal memuat daftar portofolio.</div>';
+  }
+}
+
+function renderMuridPortfolios(list) {
+  const grid = document.getElementById('murid-portfolio-grid');
+  if (!grid) return;
+
+  if (list.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: #121B2D; border: 1px dashed #26334A; border-radius: 8px;">
+        <i class="fa-solid fa-folder-plus" style="font-size: 36px; color: #F59E0B; margin-bottom: 12px;"></i>
+        <h4 style="margin: 0 0 6px 0; color: #f3f4f6;">Belum Ada Portofolio Proyek</h4>
+        <p style="margin: 0 0 16px 0; color: #8F9DB4; font-size: 13px;">Unggah karya atau proyek vokasi terbaikmu untuk divalidasi oleh guru pembimbing dan dilihat mitra industri!</p>
+        <button onclick="openAddPortfolioModal()" class="btn-primary" style="width: auto; padding: 8px 18px; font-size: 13px; background: #d97706;"><i class="fa-solid fa-plus"></i> Unggah Karya Pertama</button>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = list.map(p => {
+    let statusBadge = '';
+    let borderHighlight = '#26334A';
+
+    if (p.status === 'APPROVED') {
+      statusBadge = '<span class="portfolio-badge-verified"><i class="fa-solid fa-circle-check"></i> Terverifikasi Guru</span>';
+      borderHighlight = '#065F46';
+    } else if (p.status === 'REVISION') {
+      statusBadge = '<span style="background:#7f1d1d; color:#fca5a5; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:600;"><i class="fa-solid fa-triangle-exclamation"></i> Perlu Revisi</span>';
+      borderHighlight = '#991b1b';
+    } else {
+      statusBadge = '<span class="portfolio-badge-pending"><i class="fa-solid fa-clock"></i> Menunggu Review Guru</span>';
+      borderHighlight = '#854d0e';
+    }
+
+    const skillsArr = (p.skills || '').split(',').map(s => s.trim()).filter(Boolean);
+
+    // Feedback quote box
+    let feedbackHtml = '';
+    if (p.status === 'REVISION') {
+      feedbackHtml = `
+        <div style="background:#450a0a; border:1px solid #dc2626; border-radius:6px; padding:8px 10px; margin:8px 0; font-size:11px; color:#fecaca;">
+          <strong style="color:#fff;"><i class="fa-solid fa-triangle-exclamation"></i> Catatan Revisi Guru:</strong>
+          <p style="margin:2px 0 0;">"${escapeHtml(p.teacher_feedback || 'Mohon lengkapi dokumentasi proyek.')}"</p>
+        </div>
+      `;
+    } else if (p.status === 'APPROVED' && (p.score || p.badge)) {
+      feedbackHtml = `
+        <div style="background:#132338; border:1px solid #1e3a5f; border-radius:6px; padding:6px 10px; margin:8px 0; font-size:11px; display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:#60A5FA;"><i class="fa-solid fa-award" style="color:#FCD34D;"></i> <strong>${p.badge || 'Lencana Kompetensi'}</strong></span>
+          <span style="color:#34D399; font-weight:700;">Skor: ${p.score || 90}</span>
+        </div>
+      `;
+    }
+
+    const linkHtml = (p.demo_link || p.repo_link) 
+      ? `<a href="${escapeHtml(p.demo_link || p.repo_link)}" target="_blank" rel="noopener noreferrer" style="color: #60A5FA; text-decoration: none; font-size: 11px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Demo / Repo</a>`
+      : '';
+
+    return `
+      <div class="portfolio-card" style="border-color: ${borderHighlight}; display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+          ${statusBadge}
+          <span style="font-size: 11px; color: #8F9DB4; background:#1E293B; padding:2px 6px; border-radius:4px;">${escapeHtml(p.category || 'Proyek')}</span>
+        </div>
+        <h4 style="margin: 0 0 6px 0; color: #F3F5FA; font-size: 15px;">${escapeHtml(p.title)}</h4>
+        <p style="margin: 0 0 10px 0; color: #8F9DB4; font-size: 12px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+          ${escapeHtml(p.description || '')}
+        </p>
+        <div class="skill-tags" style="margin-bottom: 10px;">
+          ${skillsArr.map(s => `<span class="skill-tag">${escapeHtml(s)}</span>`).join('')}
+        </div>
+        ${feedbackHtml}
+        <div style="margin-top: auto; border-top: 1px solid #26334A; padding-top: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+          <div style="display: flex; gap: 6px;">
+            <button onclick="openMuridDetailPortfolioModal('${p.id}')" class="btn-secondary" style="width: auto; padding: 4px 8px; font-size: 11px;" title="Lihat Detail"><i class="fa-solid fa-eye"></i> Detail</button>
+            <button onclick="openEditPortfolioModal('${p.id}')" class="btn-secondary" style="width: auto; padding: 4px 8px; font-size: 11px; border-color:#3b82f6; color:#60A5FA;" title="Edit Karya"><i class="fa-solid fa-pen"></i> ${p.status === 'REVISION' ? 'Revisi & Kirim' : 'Edit'}</button>
+            <button onclick="handleDeletePortfolio('${p.id}', '${escapeHtml(p.title).replace(/'/g, "\\'")}')" class="btn-secondary" style="width: auto; padding: 4px 8px; font-size: 11px; border-color:#7f1d1d; color:#fca5a5;" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+          </div>
+          ${linkHtml}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterMuridPortfolios() {
+  const query = (document.getElementById('murid-portfolio-search') || {}).value?.toLowerCase() || '';
+  const status = (document.getElementById('murid-portfolio-status-filter') || {}).value || 'ALL';
+
+  const filtered = muridPortfoliosData.filter(p => {
+    const matchStatus = (status === 'ALL' || p.status === status);
+    const text = `${p.title || ''} ${p.description || ''} ${p.category || ''} ${p.skills || ''}`.toLowerCase();
+    const matchQuery = text.includes(query);
+    return matchStatus && matchQuery;
+  });
+
+  renderMuridPortfolios(filtered);
+}
+
 function openAddPortfolioModal() {
   const m = document.getElementById('add-portfolio-modal');
   if (m) m.classList.add('active');
@@ -1637,7 +2193,7 @@ async function handleCreatePortfolio(e) {
   const desc = document.getElementById('portfolio-desc').value;
 
   try {
-    const res = await window.api.fetch('/portfolios', {
+    const res = await window.api.fetch('/murid/portfolios', {
       method: 'POST',
       body: JSON.stringify({
         title,
@@ -1652,40 +2208,711 @@ async function handleCreatePortfolio(e) {
     if (result.success) {
       alert(`🎉 Portofolio "${title}" berhasil diajukan ke antrean validasi guru pembimbing!`);
       closeAddPortfolioModal();
+      loadMuridPortfolios();
+      loadMuridStats();
 
-      // Tambahkan kartu visual di tampilan Murid
-      const grid = document.getElementById('murid-portfolio-grid');
-      if (grid) {
-        const card = document.createElement('div');
-        card.className = 'portfolio-card';
-        card.style.borderColor = '#d97706';
-        card.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-            <span class="portfolio-badge-pending"><i class="fa-solid fa-clock"></i> Menunggu Guru</span>
-            <span style="font-size: 11px; color: #8F9DB4;">${escapeHtml(category)}</span>
-          </div>
-          <h4 style="margin: 0 0 6px 0; color: #F3F5FA; font-size: 15px;">${escapeHtml(title)}</h4>
-          <p style="margin: 0 0 10px 0; color: #8F9DB4; font-size: 12px; line-height: 1.4;">${escapeHtml(desc)}</p>
-          <div class="skill-tags">
-            ${skills.split(',').map(s => `<span class="skill-tag">${escapeHtml(s.trim())}</span>`).join('')}
-          </div>
-          <div style="margin-top: auto; border-top: 1px solid #26334A; padding-top: 8px; display: flex; justify-content: space-between; font-size: 11px; color: #FCD34D;">
-            <span>Status: Pengajuan Baru</span>
-            <span style="color: #9ca3af;">Baru saja</span>
-          </div>
-        `;
-        grid.prepend(card);
-      }
-
-      // Update Guru state jika sedang aktif
-      loadGuruStats();
-      loadGuruPortfolios();
+      // Sinkronkan antrean guru jika terbuka
+      if (typeof loadGuruPortfolios === 'function') loadGuruPortfolios();
+      if (typeof loadGuruStats === 'function') loadGuruStats();
     } else {
       alert(result.message || 'Gagal mengajukan portofolio');
     }
   } catch (err) {
     console.error('Error create portfolio:', err);
     alert('Terjadi kesalahan saat mengajukan portofolio.');
+  }
+}
+
+function openEditPortfolioModal(id) {
+  const p = muridPortfoliosData.find(item => item.id === id);
+  if (!p) return;
+
+  const idInput = document.getElementById('edit-portfolio-id');
+  const titleInput = document.getElementById('edit-portfolio-title');
+  const catInput = document.getElementById('edit-portfolio-category');
+  const linkInput = document.getElementById('edit-portfolio-link');
+  const skillsInput = document.getElementById('edit-portfolio-skills');
+  const descInput = document.getElementById('edit-portfolio-desc');
+  const revNotice = document.getElementById('edit-portfolio-revision-notice');
+  const revText = document.getElementById('edit-portfolio-revision-text');
+
+  if (idInput) idInput.value = p.id;
+  if (titleInput) titleInput.value = p.title || '';
+  if (catInput) catInput.value = p.category || 'Web App';
+  if (linkInput) linkInput.value = p.demo_link || p.repo_link || '';
+  if (skillsInput) skillsInput.value = p.skills || '';
+  if (descInput) descInput.value = p.description || '';
+
+  if (revNotice && revText) {
+    if (p.status === 'REVISION') {
+      revNotice.style.display = 'block';
+      revText.textContent = p.teacher_feedback || 'Lengkapi dokumentasi dan perbaiki fitur.';
+    } else {
+      revNotice.style.display = 'none';
+    }
+  }
+
+  const modal = document.getElementById('modalEditPortfolio');
+  if (modal) modal.classList.add('active');
+}
+
+function closeEditPortfolioModal() {
+  const modal = document.getElementById('modalEditPortfolio');
+  if (modal) modal.classList.remove('active');
+}
+
+async function handleUpdatePortfolio(e) {
+  e.preventDefault();
+  const id = document.getElementById('edit-portfolio-id').value;
+  const title = document.getElementById('edit-portfolio-title').value;
+  const category = document.getElementById('edit-portfolio-category').value;
+  const link = document.getElementById('edit-portfolio-link').value;
+  const skills = document.getElementById('edit-portfolio-skills').value;
+  const description = document.getElementById('edit-portfolio-desc').value;
+
+  try {
+    const res = await window.api.fetch(`/murid/portfolios/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        title,
+        category,
+        skills,
+        description,
+        demo_link: link,
+        repo_link: link
+      })
+    });
+    const result = await res.json();
+    if (result.success) {
+      alert(`✅ Portofolio "${title}" berhasil diperbarui dan diajukan ke antrean validasi guru!`);
+      closeEditPortfolioModal();
+      loadMuridPortfolios();
+      loadMuridStats();
+
+      // Sinkronkan view guru
+      if (typeof loadGuruPortfolios === 'function') loadGuruPortfolios();
+      if (typeof loadGuruStats === 'function') loadGuruStats();
+    } else {
+      alert(result.message || 'Gagal memperbarui portofolio');
+    }
+  } catch (err) {
+    console.error('Error update portfolio:', err);
+    alert('Terjadi kesalahan koneksi.');
+  }
+}
+
+async function handleDeletePortfolio(id, title) {
+  if (!confirm(`Hapus portofolio "${title}"? Tindakan ini tidak dapat dibatalkan.`)) return;
+
+  try {
+    const res = await window.api.fetch(`/murid/portfolios/${id}`, {
+      method: 'DELETE'
+    });
+    const result = await res.json();
+    if (result.success) {
+      alert('Portofolio telah berhasil dihapus.');
+      loadMuridPortfolios();
+      loadMuridStats();
+
+      if (typeof loadGuruPortfolios === 'function') loadGuruPortfolios();
+      if (typeof loadGuruStats === 'function') loadGuruStats();
+    } else {
+      alert(result.message || 'Gagal menghapus portofolio');
+    }
+  } catch (err) {
+    console.error('Error delete portfolio:', err);
+  }
+}
+
+function openMuridDetailPortfolioModal(id) {
+  const p = muridPortfoliosData.find(item => item.id === id);
+  if (!p) return;
+
+  const bodyEl = document.getElementById('detail-portfolio-body');
+  const headEl = document.getElementById('detail-portfolio-title-head');
+
+  if (headEl) headEl.innerHTML = `<i class="fa-solid fa-layer-group"></i> ${escapeHtml(p.title)}`;
+
+  let statusBadge = '';
+  if (p.status === 'APPROVED') statusBadge = '<span class="portfolio-badge-verified"><i class="fa-solid fa-circle-check"></i> Terverifikasi Guru</span>';
+  else if (p.status === 'REVISION') statusBadge = '<span style="background:#7f1d1d; color:#fca5a5; padding:2px 8px; border-radius:12px; font-size:11px;">⚠️ Butuh Revisi</span>';
+  else statusBadge = '<span class="portfolio-badge-pending"><i class="fa-solid fa-clock"></i> Menunggu Validasi</span>';
+
+  const skillsArr = (p.skills || '').split(',').map(s => s.trim()).filter(Boolean);
+
+  if (bodyEl) {
+    bodyEl.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #26334A;">
+        <div>${statusBadge}</div>
+        <span style="color:#8F9DB4; font-size:12px;">Kategori: <strong style="color:#fff;">${escapeHtml(p.category)}</strong></span>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="color:#9ca3af; font-size:11px; font-weight:600;">DESKRIPSI LENGKAP KARYA:</label>
+        <p style="margin:4px 0 0; color:#cbd5e1; line-height:1.5; white-space:pre-wrap;">${escapeHtml(p.description || '-')}</p>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="color:#9ca3af; font-size:11px; font-weight:600;">KEAHLIAN & TECH STACK:</label>
+        <div class="skill-tags" style="margin-top:4px;">
+          ${skillsArr.map(s => `<span class="skill-tag">${escapeHtml(s)}</span>`).join('')}
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; background:#18243A; padding:10px; border-radius:6px;">
+        <div>
+          <span style="font-size:11px; color:#8F9DB4;">Link Demo / Live:</span>
+          <div style="margin-top:2px;">
+            ${p.demo_link ? `<a href="${escapeHtml(p.demo_link)}" target="_blank" style="color:#60A5FA; text-decoration:none; font-size:12px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Tautan</a>` : '<span style="color:#6b7280; font-size:12px;">Tidak ada</span>'}
+          </div>
+        </div>
+        <div>
+          <span style="font-size:11px; color:#8F9DB4;">Link Repository / Source:</span>
+          <div style="margin-top:2px;">
+            ${p.repo_link ? `<a href="${escapeHtml(p.repo_link)}" target="_blank" style="color:#60A5FA; text-decoration:none; font-size:12px;"><i class="fa-solid fa-code"></i> Buka Kode</a>` : '<span style="color:#6b7280; font-size:12px;">Tidak ada</span>'}
+          </div>
+        </div>
+      </div>
+      ${(p.teacher_feedback || p.score || p.badge) ? `
+        <div style="background:#0F172A; border:1px solid #1E293B; border-radius:6px; padding:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <strong style="color:#FCD34D;"><i class="fa-solid fa-chalkboard-user"></i> Penilaian Guru Pembimbing:</strong>
+            ${p.score ? `<span style="background:#065F46; color:#6EE7B7; padding:2px 8px; border-radius:10px; font-weight:700;">Skor: ${p.score}</span>` : ''}
+          </div>
+          ${p.badge ? `<p style="margin:0 0 6px 0; color:#60A5FA; font-size:12px;"><i class="fa-solid fa-award"></i> Lencana: <strong>${escapeHtml(p.badge)}</strong></p>` : ''}
+          <p style="margin:0; font-size:12px; color:#cbd5e1; font-style:italic;">"${escapeHtml(p.teacher_feedback || 'Proyek telah memenuhi standar kompetensi vokasi.')}"</p>
+        </div>
+      ` : ''}
+    `;
+  }
+
+  const modal = document.getElementById('modalMuridDetailPortfolio');
+  if (modal) modal.classList.add('active');
+}
+
+function closeMuridDetailPortfolioModal() {
+  const modal = document.getElementById('modalMuridDetailPortfolio');
+  if (modal) modal.classList.remove('active');
+}
+
+// 7.4 Lencana Keahlian (Earned Badges)
+async function loadMuridBadges() {
+  const grid = document.getElementById('murid-badges-grid');
+  if (!grid) return;
+
+  try {
+    const res = await window.api.fetch('/murid/badges');
+    const result = await res.json();
+    if (result.success && Array.isArray(result.data)) {
+      muridBadgesData = result.data;
+      if (muridBadgesData.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: #121B2D; border: 1px dashed #26334A; border-radius: 8px;">
+            <i class="fa-solid fa-award" style="font-size: 36px; color: #60A5FA; margin-bottom: 12px;"></i>
+            <h4 style="margin: 0 0 6px 0; color: #f3f4f6;">Belum Ada Lencana Keahlian</h4>
+            <p style="margin: 0 0 16px 0; color: #8F9DB4; font-size: 13px;">Lencana keahlian akan diberikan otomatis oleh guru pembimbing setelah portofolio proyek kamu disetujui dengan predikat memuaskan.</p>
+            <button onclick="switchMuridTab('portfolios')" class="btn-primary" style="width: auto; padding: 8px 18px; font-size: 13px; background: #2563eb;">Lihat Galeri Portofolio</button>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = muridBadgesData.map(b => `
+        <div style="background: linear-gradient(145deg, #18243A, #121B2D); border: 1px solid #F59E0B; border-radius: 8px; padding: 18px; display: flex; flex-direction: column;">
+          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: radial-gradient(circle, #FCD34D, #D97706); display: flex; align-items: center; justify-content: center; font-size: 22px; color: #080D19; box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);">
+              <i class="fa-solid fa-medal"></i>
+            </div>
+            <div>
+              <h4 style="margin: 0; color: #FCD34D; font-size: 15px;">${escapeHtml(b.badge || 'Kompetensi Vokasi')}</h4>
+              <p style="margin: 2px 0 0; color: #8F9DB4; font-size: 12px;">Kategori: ${escapeHtml(b.category || 'Teknologi')}</p>
+            </div>
+          </div>
+          <p style="margin: 0 0 10px 0; color: #f3f4f6; font-size: 13px; font-weight: 500;">
+            Karya: "${escapeHtml(b.project_title)}"
+          </p>
+          <div style="margin-top: auto; border-top: 1px solid #26334A; padding-top: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
+            <span style="color: #6EE7B7;"><i class="fa-solid fa-check"></i> Skor: <strong>${b.score || 95}</strong>/100</span>
+            <span style="color: #8F9DB4;">${b.reviewed_at ? new Date(b.reviewed_at).toLocaleDateString('id-ID') : 'Terverifikasi'}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+  } catch (err) {
+    console.error('Error loadMuridBadges:', err);
+  }
+}
+
+// 7.5 Status PKL & Jurnal Bimbingan Siswa
+async function loadMuridPKL() {
+  const container = document.getElementById('murid-pkl-details');
+  if (!container) return;
+
+  try {
+    const res = await window.api.fetch('/murid/pkl');
+    const result = await res.json();
+    if (result.success && result.data) {
+      const p = result.data;
+      muridPKLData = p;
+
+      let statusColor = '#60A5FA';
+      if (p.status === 'Selesai') statusColor = '#34D399';
+      else if (p.status === 'Aktif') statusColor = '#FBBF24';
+
+      container.innerHTML = `
+        <div style="background: #18243A; border: 1px solid #26334A; border-radius: 8px; padding: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+            <div>
+              <h4 style="margin: 0 0 4px 0; color: #fff; font-size: 16px;">${escapeHtml(p.partner_name || 'Mitra Industri')}</h4>
+              <p style="margin: 0; color: #60A5FA; font-size: 12px;">${escapeHtml(p.partner_category || 'DUDI')} • ${escapeHtml(p.partner_address || '-')}</p>
+            </div>
+            <span class="role-badge" style="background: #1E293B; color: ${statusColor}; border: 1px solid ${statusColor}; font-weight: 600;">
+              ${escapeHtml(p.status || 'Aktif')}
+            </span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; background: #0D1525; padding: 12px; border-radius: 6px;">
+            <div>
+              <span style="font-size: 11px; color: #8F9DB4;">Periode Praktik:</span>
+              <p style="margin: 2px 0 0; color: #fff; font-size: 12px;">
+                ${p.start_date ? new Date(p.start_date).toLocaleDateString('id-ID') : '-'} s/d ${p.end_date ? new Date(p.end_date).toLocaleDateString('id-ID') : '-'}
+              </p>
+            </div>
+            <div>
+              <span style="font-size: 11px; color: #8F9DB4;">Tingkat Kehadiran:</span>
+              <p style="margin: 2px 0 0; color: #34D399; font-size: 12px; font-weight: 700;">
+                ${p.attendance_rate || 98}% Kehadiran
+              </p>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+              <span style="color: #9ca3af;">Progres Kehadiran & Partisipasi:</span>
+              <span style="color: #6EE7B7; font-weight: 600;">${p.attendance_rate || 98}%</span>
+            </div>
+            <div style="width: 100%; height: 8px; background: #26334A; border-radius: 4px; overflow: hidden;">
+              <div style="width: ${p.attendance_rate || 98}%; height: 100%; background: linear-gradient(90deg, #10B981, #059669);"></div>
+            </div>
+          </div>
+
+          ${p.score ? `
+            <div style="background: #102A24; border: 1px solid #065F46; border-radius: 6px; padding: 10px 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #6EE7B7; font-size: 12px;"><i class="fa-solid fa-star"></i> Nilai Kinerja PKL Industri:</span>
+              <strong style="color: #fff; font-size: 15px;">${p.score} / 100</strong>
+            </div>
+          ` : ''}
+
+          ${p.notes ? `
+            <div style="font-size: 11px; color: #9ca3af; border-top: 1px solid #26334A; padding-top: 8px;">
+              <strong>Catatan Pembimbing:</strong> ${escapeHtml(p.notes)}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    } else {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 30px; background: #121B2D; border: 1px dashed #26334A; border-radius: 8px;">
+          <i class="fa-solid fa-briefcase" style="font-size: 32px; color: #8F9DB4; margin-bottom: 10px;"></i>
+          <h5 style="margin: 0 0 6px 0; color: #f3f4f6;">Belum Ada Penempatan PKL Aktif</h5>
+          <p style="margin: 0 0 14px 0; color: #8F9DB4; font-size: 12px;">Ajukan lamaran ke lowongan magang mitra industri atau konsultasikan penempatan dengan guru pembimbing.</p>
+          <button onclick="switchMuridTab('vacancies')" class="btn-primary" style="width: auto; padding: 6px 14px; font-size: 12px; background: #2563eb;">Eksplorasi Lowongan Magang</button>
+        </div>
+      `;
+    }
+  } catch (err) {
+    console.error('Error loadMuridPKL:', err);
+  }
+}
+
+async function loadMuridGuidance() {
+  const container = document.getElementById('murid-guidance-list');
+  if (!container) return;
+
+  try {
+    const res = await window.api.fetch('/murid/bimbingan');
+    const result = await res.json();
+    if (result.success && Array.isArray(result.data)) {
+      muridGuidanceData = result.data;
+      if (muridGuidanceData.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 30px; color: #8F9DB4; font-size: 12px;">
+            Belum ada riwayat sesi bimbingan yang dicatat oleh guru pembimbing.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = muridGuidanceData.map(g => `
+        <div style="background: #18243A; border-left: 3px solid #db2777; border-radius: 6px; padding: 12px 14px; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;">
+            <h5 style="margin: 0; color: #F472B6; font-size: 13px;">${escapeHtml(g.topic || 'Sesi Bimbingan')}</h5>
+            <span style="font-size: 11px; color: #8F9DB4;">${g.session_date ? new Date(g.session_date).toLocaleDateString('id-ID') : '-'}</span>
+          </div>
+          <p style="margin: 0 0 6px 0; color: #cbd5e1; font-size: 12px; line-height: 1.4;">
+            ${escapeHtml(g.notes || '')}
+          </p>
+          ${g.action_plan ? `
+            <div style="background: #0D1525; padding: 6px 10px; border-radius: 4px; font-size: 11px; color: #FCD34D;">
+              <i class="fa-solid fa-list-check"></i> <strong>Rencana Tindak Lanjut:</strong> ${escapeHtml(g.action_plan)}
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+  } catch (err) {
+    console.error('Error loadMuridGuidance:', err);
+  }
+}
+
+// 7.6 Lowongan Magang Industri & Melamar Magang
+async function loadMuridVacancies() {
+  const grid = document.getElementById('murid-vacancies-grid');
+  if (!grid) return;
+
+  try {
+    const res = await window.api.fetch('/murid/vacancies');
+    const result = await res.json();
+    if (result.success && Array.isArray(result.data)) {
+      muridVacanciesData = result.data;
+      renderMuridVacancies(muridVacanciesData);
+    }
+  } catch (err) {
+    console.error('Error loadMuridVacancies:', err);
+    grid.innerHTML = '<div style="color:#ef4444; padding:20px; text-align:center;">Gagal memuat lowongan magang.</div>';
+  }
+}
+
+function renderMuridVacancies(list) {
+  const grid = document.getElementById('murid-vacancies-grid');
+  if (!grid) return;
+
+  if (list.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #8F9DB4;">
+        Tidak ada lowongan magang yang sesuai dengan kriteria pencarian.
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = list.map(v => {
+    const isApplied = Boolean(v.application_id);
+    return `
+      <div style="background: #18243A; border: 1px solid #26334A; border-radius: 8px; padding: 18px; display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+          <div>
+            <h4 style="margin: 0; color: #fff; font-size: 15px;">${escapeHtml(v.title)}</h4>
+            <p style="margin: 2px 0 0; color: #60A5FA; font-size: 12px; font-weight: 500;">${escapeHtml(v.partner_name)}</p>
+          </div>
+          <span class="role-badge badge-guru" style="font-size: 10px;">Kuota: ${v.quota}</span>
+        </div>
+        
+        <div style="font-size: 11px; color: #8F9DB4; margin-bottom: 10px; display: flex; gap: 10px;">
+          <span><i class="fa-solid fa-briefcase"></i> ${escapeHtml(v.department || 'Operasional')}</span>
+          <span><i class="fa-solid fa-location-dot"></i> ${escapeHtml(v.location || 'Bandung')}</span>
+        </div>
+
+        <div style="background: #0D1525; padding: 8px 10px; border-radius: 6px; font-size: 12px; color: #cbd5e1; margin-bottom: 14px; flex-grow: 1;">
+          <strong style="color: #9ca3af; font-size: 11px;">Kualifikasi:</strong>
+          <p style="margin: 3px 0 0; line-height: 1.4;">${escapeHtml(v.requirements || 'Siswa SMK aktif')}</p>
+        </div>
+
+        <div style="margin-top: auto; border-top: 1px solid #26334A; padding-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+          ${isApplied ? `
+            <span style="background: #065F46; color: #6EE7B7; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;">
+              <i class="fa-solid fa-check"></i> Sudah Dilamar (${escapeHtml(v.application_status || 'Menunggu Tinjauan')})
+            </span>
+          ` : `
+            <button onclick="openApplyVacancyModal('${v.id}')" class="btn-primary" style="width: auto; padding: 6px 14px; font-size: 12px; background: #db2777;">
+              <i class="fa-solid fa-paper-plane"></i> Lamar Posisi Ini
+            </button>
+          `}
+          <span style="font-size: 11px; color: #8F9DB4;">Kemitraan DUDI</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterMuridVacancies() {
+  const query = (document.getElementById('murid-vacancy-search') || {}).value?.toLowerCase() || '';
+  const filtered = muridVacanciesData.filter(v => {
+    const text = `${v.title || ''} ${v.partner_name || ''} ${v.department || ''} ${v.requirements || ''}`.toLowerCase();
+    return text.includes(query);
+  });
+  renderMuridVacancies(filtered);
+}
+
+function openApplyVacancyModal(id) {
+  const v = muridVacanciesData.find(item => item.id === id);
+  if (!v) return;
+
+  const idInput = document.getElementById('apply-vacancy-id');
+  const titleEl = document.getElementById('apply-vacancy-title');
+  const partnerEl = document.getElementById('apply-vacancy-partner');
+  const quotaEl = document.getElementById('apply-vacancy-quota');
+  const locEl = document.getElementById('apply-vacancy-location');
+  const reqsEl = document.getElementById('apply-vacancy-reqs');
+  const notesInput = document.getElementById('apply-notes');
+
+  if (idInput) idInput.value = v.id;
+  if (titleEl) titleEl.textContent = v.title;
+  if (partnerEl) partnerEl.textContent = `${v.partner_name} • Divisi ${v.department || 'Industri'}`;
+  if (quotaEl) quotaEl.innerHTML = `<i class="fa-solid fa-users"></i> Kuota: ${v.quota} Siswa`;
+  if (locEl) locEl.innerHTML = `<i class="fa-solid fa-location-dot"></i> ${v.location || 'Bandung'}`;
+  if (reqsEl) reqsEl.textContent = v.requirements || 'Menguasai keterampilan vokasi terkait.';
+  if (notesInput) notesInput.value = `Saya sangat antusias untuk melamar posisi magang ${v.title} di ${v.partner_name}. Saya telah menyelesaikan portofolio proyek dan siap berkontribusi secara profesional.`;
+
+  const modal = document.getElementById('modalApplyVacancy');
+  if (modal) modal.classList.add('active');
+}
+
+function closeApplyVacancyModal() {
+  const modal = document.getElementById('modalApplyVacancy');
+  if (modal) modal.classList.remove('active');
+}
+
+async function handleApplyVacancy(e) {
+  e.preventDefault();
+  const vacancy_id = document.getElementById('apply-vacancy-id').value;
+  const notes = document.getElementById('apply-notes').value;
+
+  try {
+    const res = await window.api.fetch('/murid/apply', {
+      method: 'POST',
+      body: JSON.stringify({ vacancy_id, notes })
+    });
+    const result = await res.json();
+    if (result.success) {
+      alert(result.message || '🎉 Lamaran magang berhasil dikirimkan!');
+      closeApplyVacancyModal();
+      loadMuridVacancies();
+      loadMuridStats();
+    } else {
+      alert(result.message || 'Gagal mengajukan lamaran magang');
+    }
+  } catch (err) {
+    console.error('Error apply vacancy:', err);
+    alert('Terjadi kesalahan koneksi.');
+  }
+}
+
+// 7.7 Cetak Resume Portofolio Digital Siswa (Print-Ready CV)
+async function openMuridResumeModal() {
+  const area = document.getElementById('murid-resume-printable-area');
+  const modal = document.getElementById('modalMuridResume');
+  if (!area || !modal) return;
+
+  area.innerHTML = '<div style="text-align:center; padding:30px;"><i class="fa-solid fa-circle-notch fa-spin"></i> Menyusun resume talenta...</div>';
+  modal.classList.add('active');
+
+  try {
+    const res = await window.api.fetch('/murid/resume');
+    const result = await res.json();
+    if (result.success) {
+      const p = result.profile || {};
+      const ports = result.verified_portfolios || [];
+      const pkl = result.pkl;
+
+      const skillsArr = (p.skills || '').split(',').map(s => s.trim()).filter(Boolean);
+
+      area.innerHTML = `
+        <div style="max-width: 760px; margin: 0 auto; color: #fff; font-family: inherit;">
+          <!-- Header Resume -->
+          <div style="display: flex; justify-content: space-between; align-items: start; border-bottom: 2px solid #38BDF8; padding-bottom: 16px; margin-bottom: 20px;">
+            <div>
+              <span style="font-size: 11px; color: #38BDF8; font-weight: 700; letter-spacing: 1px;">CDGS SCHOOL CORE • VOCATIONAL TALENT CV</span>
+              <h2 style="margin: 4px 0 2px 0; color: #fff; font-size: 24px;">${escapeHtml(p.full_name || 'Muhammad Razan')}</h2>
+              <p style="margin: 0; color: #94A3B8; font-size: 13px;">
+                NISN: ${escapeHtml(p.nisn || '-')} • ${escapeHtml(p.class_name || 'XII RPL 1')} • ${escapeHtml(p.major || 'Rekayasa Perangkat Lunak')}
+              </p>
+              <p style="margin: 2px 0 0; color: #60A5FA; font-size: 12px;">Kontak: ${escapeHtml(p.email || 'murid@cdgs.local')}</p>
+            </div>
+            <div style="text-align: right; background: #1E293B; border: 1px solid #38BDF8; padding: 10px 16px; border-radius: 8px;">
+              <span style="font-size: 10px; color: #94A3B8;">INDEKS KESIAPAN TALENTA</span>
+              <div style="font-size: 26px; font-weight: 800; color: #38BDF8;">${p.is_recommended ? '95' : '88'}<small style="font-size:12px; color:#94A3B8;">/100</small></div>
+              <span style="font-size: 11px; color: #34D399; font-weight: 600;">⭐ Siap Kerja Industri</span>
+            </div>
+          </div>
+
+          <!-- Section 1: Kompetensi & Tech Stack -->
+          <div style="margin-bottom: 20px;">
+            <h4 style="margin: 0 0 8px 0; color: #FCD34D; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">
+              <i class="fa-solid fa-code"></i> Keahlian Teknis & Tech Stack
+            </h4>
+            <div class="skill-tags" style="margin: 0;">
+              ${skillsArr.map(s => `<span class="skill-tag skill-tag-highlight" style="font-size:12px; padding:4px 10px;">${escapeHtml(s)}</span>`).join('')}
+            </div>
+          </div>
+
+          <!-- Section 2: Portofolio Proyek Terverifikasi -->
+          <div style="margin-bottom: 20px;">
+            <h4 style="margin: 0 0 10px 0; color: #34D399; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">
+              <i class="fa-solid fa-folder-check"></i> Proyek & Karya Unggulan (Terverifikasi Guru)
+            </h4>
+            ${ports.length === 0 ? '<p style="color:#94A3B8; font-size:12px;">Belum ada portofolio yang disetujui guru.</p>' : `
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                ${ports.map(port => `
+                  <div style="background: #18243A; border: 1px solid #26334A; border-radius: 6px; padding: 12px 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                      <h5 style="margin: 0; color: #fff; font-size: 14px;">${escapeHtml(port.title)}</h5>
+                      <span style="background: #065F46; color: #6EE7B7; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;">
+                        ${port.badge ? `${escapeHtml(port.badge)} • ` : ''}Skor: ${port.score || 90}
+                      </span>
+                    </div>
+                    <p style="margin: 4px 0 6px 0; color: #94A3B8; font-size: 12px; line-height: 1.4;">${escapeHtml(port.description || '')}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #8F9DB4; border-top: 1px solid #26334A; padding-top: 6px;">
+                      <span>Tech: ${escapeHtml(port.skills || '-')}</span>
+                      ${port.demo_link ? `<span style="color:#60A5FA;">Demo/Repo: ${escapeHtml(port.demo_link)}</span>` : ''}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `}
+          </div>
+
+          <!-- Section 3: Pengalaman Praktik Kerja Lapangan (PKL) -->
+          <div style="margin-bottom: 24px;">
+            <h4 style="margin: 0 0 8px 0; color: #60A5FA; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">
+              <i class="fa-solid fa-briefcase"></i> Pengalaman Praktik Kerja Lapangan (PKL)
+            </h4>
+            ${pkl ? `
+              <div style="background: #18243A; border: 1px solid #26334A; border-radius: 6px; padding: 12px 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                  <div>
+                    <h5 style="margin: 0; color: #fff; font-size: 14px;">${escapeHtml(pkl.partner_name)}</h5>
+                    <p style="margin: 2px 0 0; color: #60A5FA; font-size: 12px;">${escapeHtml(pkl.partner_category || 'Industri')} • ${escapeHtml(pkl.partner_address || '-')}</p>
+                  </div>
+                  <span style="color: #34D399; font-weight: 700; font-size: 12px;">Kehadiran: ${pkl.attendance_rate || 98}%</span>
+                </div>
+                ${pkl.score ? `<p style="margin: 6px 0 0; color: #FCD34D; font-size: 12px;">Evaluasi Industri: <strong>${pkl.score}/100</strong></p>` : ''}
+              </div>
+            ` : '<p style="color:#94A3B8; font-size:12px;">Sedang dalam proses penempatan mitra industri.</p>'}
+          </div>
+
+          <!-- Stamp & Signature Footer -->
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #334155; padding-top: 16px; margin-top: 20px; font-size: 11px; color: #94A3B8;">
+            <div>
+              <p style="margin: 0;">Sertifikasi Keabsahan Portofolio Sekolah Vokasi</p>
+              <p style="margin: 2px 0 0; color: #6EE7B7;"><i class="fa-solid fa-stamp"></i> Terverifikasi Sistem CDGS Core Blockchain-Ready</p>
+            </div>
+            <div style="text-align: right;">
+              <p style="margin: 0;">Dicetak pada: ${new Date().toLocaleDateString('id-ID', { dateStyle: 'long' })}</p>
+              <p style="margin: 2px 0 0; color: #fff; font-weight: 600;">Guru Pembimbing: ${escapeHtml(p.mentor_email || 'Bpk. Budi Santoso')}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  } catch (err) {
+    console.error('Error loadMuridResume:', err);
+    area.innerHTML = '<div style="color:#ef4444; text-align:center; padding:20px;">Gagal memuat resume talenta.</div>';
+  }
+}
+
+function closeMuridResumeModal() {
+  const modal = document.getElementById('modalMuridResume');
+  if (modal) modal.classList.remove('active');
+}
+
+// 7.8 Undangan Magang Masuk dari Mitra DUDI
+async function loadMuridInvitations() {
+  const listEl = document.getElementById('murid-invitations-list');
+  const badgeEl = document.getElementById('murid-invitations-tab-badge');
+  if (!listEl) return;
+
+  try {
+    const res = await window.api.fetch('/murid/invitations');
+    const result = await res.json();
+    if (result.success && Array.isArray(result.data)) {
+      muridInvitationsData = result.data;
+      
+      const pendingCount = muridInvitationsData.filter(i => i.status === 'PENDING').length;
+      if (badgeEl) {
+        badgeEl.textContent = pendingCount;
+        badgeEl.style.display = pendingCount > 0 ? 'inline-block' : 'none';
+      }
+
+      if (muridInvitationsData.length === 0) {
+        listEl.innerHTML = `
+          <div style="text-align: center; padding: 40px; background: #121B2D; border: 1px dashed #26334A; border-radius: 8px;">
+            <i class="fa-solid fa-envelope-open" style="font-size: 32px; color: #8F9DB4; margin-bottom: 10px;"></i>
+            <h5 style="margin: 0 0 6px 0; color: #f3f4f6;">Belum Ada Undangan Magang Masuk</h5>
+            <p style="margin: 0; color: #8F9DB4; font-size: 12px;">Lengkapi dan publikasikan portofolio terbaikmu agar dilirik oleh mitra DUDI & industri.</p>
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = muridInvitationsData.map(inv => {
+        let statusBadge = '';
+        if (inv.status === 'ACCEPTED') {
+          statusBadge = '<span style="background: #065F46; color: #6EE7B7; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;"><i class="fa-solid fa-circle-check"></i> Diterima Siswa</span>';
+        } else if (inv.status === 'REJECTED') {
+          statusBadge = '<span style="background: #374151; color: #9ca3af; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;"><i class="fa-solid fa-circle-xmark"></i> Ditolak</span>';
+        } else {
+          statusBadge = '<span style="background: #78350F; color: #FCD34D; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;"><i class="fa-solid fa-clock"></i> Menunggu Tanggapan</span>';
+        }
+
+        return `
+          <div style="background: #18243A; border: 1px solid ${inv.status === 'PENDING' ? '#db2777' : '#26334A'}; border-radius: 8px; padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                  <span style="font-size: 11px; font-weight: 700; color: #EC4899; background: rgba(236, 72, 153, 0.15); padding: 2px 8px; border-radius: 4px;"><i class="fa-solid fa-building"></i> ${escapeHtml(inv.partner_name || 'Mitra DUDI')}</span>
+                  <span style="font-size: 11px; color: #8F9DB4;"><i class="fa-regular fa-clock"></i> ${escapeHtml(inv.created_at_fmt || 'Baru saja')}</span>
+                </div>
+                <h4 style="margin: 0; color: #fff; font-size: 16px;">${escapeHtml(inv.position)}</h4>
+              </div>
+              <div>${statusBadge}</div>
+            </div>
+
+            <div style="background: #0D1525; padding: 10px 14px; border-radius: 6px; font-size: 13px; color: #cbd5e1; line-height: 1.5; border-left: 3px solid #EC4899;">
+              <strong style="color: #9ca3af; font-size: 11px; display: block; margin-bottom: 2px;">Pesan Undangan dari Industri:</strong>
+              ${escapeHtml(inv.notes || 'Perusahaan kami tertarik dengan portofolio Anda dan mengundang untuk tahap wawancara magang.')}
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #26334A; padding-top: 10px; flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 11px; color: #8F9DB4;"><i class="fa-solid fa-shield-halved"></i> Terverifikasi Kemitraan Sekolah CDGS</span>
+              ${inv.status === 'PENDING' ? `
+                <div style="display: flex; gap: 8px;">
+                  <button onclick="respondMuridInvitation('${inv.id}', 'REJECTED')" class="btn-secondary" style="width: auto; padding: 6px 14px; font-size: 12px; border-color: #4b5563; color: #9ca3af;">Tolak</button>
+                  <button onclick="respondMuridInvitation('${inv.id}', 'ACCEPTED')" class="btn-primary" style="width: auto; padding: 6px 16px; font-size: 12px; background: #059669;"><i class="fa-solid fa-check"></i> Terima Tawaran Magang</button>
+                </div>
+              ` : `
+                <span style="font-size: 12px; color: #6EE7B7;"><i class="fa-solid fa-check-double"></i> Tanggapan telah dikirim ke mitra industri</span>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  } catch (err) {
+    console.error('Error loadMuridInvitations:', err);
+    listEl.innerHTML = '<div style="color:#ef4444; padding:20px; text-align:center;">Gagal memuat undangan magang masuk.</div>';
+  }
+}
+
+async function respondMuridInvitation(invitationId, status) {
+  const confirmMsg = status === 'ACCEPTED' 
+    ? 'Apakah Anda yakin ingin menerima undangan magang ini? Pihak industri dan sekolah akan segera menerima konfirmasi Anda.'
+    : 'Apakah Anda yakin ingin menolak tawaran magang ini?';
+  
+  if (!confirm(confirmMsg)) return;
+
+  try {
+    const res = await window.api.fetch(`/murid/invitations/${invitationId}/respond`, {
+      method: 'PUT',
+      body: JSON.stringify({ status })
+    });
+    const result = await res.json();
+    if (result.success) {
+      alert(result.message || 'Tanggapan berhasil disimpan!');
+      loadMuridInvitations();
+    } else {
+      alert(`Gagal: ${result.message || 'Terjadi kesalahan'}`);
+    }
+  } catch (err) {
+    console.error('Error respondMuridInvitation:', err);
+    alert('Terjadi kesalahan saat memproses tanggapan.');
   }
 }
 
@@ -1721,8 +2948,11 @@ function filterTalents() {
 }
 
 let targetInviteStudent = '';
+let targetInviteMajor = '';
+
 function inviteTalent(studentName, major) {
   targetInviteStudent = studentName;
+  targetInviteMajor = major || '';
   const label = document.getElementById('invite-student-name');
   if (label) label.textContent = `${studentName} (${major})`;
 
@@ -1735,11 +2965,104 @@ function closeInviteModal() {
   if (modal) modal.classList.remove('active');
 }
 
-function handleSendInvitation(e) {
+async function handleSendInvitation(e) {
   e.preventDefault();
-  const pos = document.getElementById('invite-position').value;
-  closeInviteModal();
-  alert(`📨 Undangan magang untuk posisi "${pos}" telah berhasil dikirimkan kepada ${targetInviteStudent} dan ditembuskan ke pihak sekolah!`);
+  const posInput = document.getElementById('invite-position');
+  const notesInput = document.getElementById('invite-notes');
+  const pos = posInput ? posInput.value.trim() : 'Junior Developer Intern';
+  const notes = notesInput ? notesInput.value.trim() : '';
+
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn ? submitBtn.innerHTML : 'Kirim Undangan';
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengirimkan...';
+  }
+
+  try {
+    const res = await window.api.fetch('/partners/invite', {
+      method: 'POST',
+      body: JSON.stringify({
+        student_name: targetInviteStudent,
+        student_major: targetInviteMajor,
+        position: pos,
+        notes: notes
+      })
+    });
+    const result = await res.json();
+    closeInviteModal();
+    if (result.success) {
+      alert(`🎉 Undangan magang untuk posisi "${pos}" berhasil dikirim ke ${targetInviteStudent}!\n\nUndangan ini kini telah masuk ke akun siswa (Tab "Undangan Magang Masuk") dan tersinkronisasi ke sistem sekolah.`);
+      loadInstansiInvitations();
+    } else {
+      alert(`Gagal mengirim undangan: ${result.message || 'Terjadi kesalahan sistem'}`);
+    }
+  } catch (err) {
+    console.error('Error handleSendInvitation:', err);
+    alert('Terjadi kesalahan koneksi saat mengirim undangan.');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
+    }
+  }
+}
+
+async function loadInstansiInvitations() {
+  const listEl = document.getElementById('instansi-invitations-list');
+  if (!listEl) return;
+
+  try {
+    const res = await window.api.fetch('/partners/invitations');
+    const result = await res.json();
+    if (result.success && Array.isArray(result.data)) {
+      const invitations = result.data;
+      if (invitations.length === 0) {
+        listEl.innerHTML = `
+          <div style="text-align: center; padding: 30px; color: #8F9DB4; font-size: 13px; border: 1px dashed #26334A; border-radius: 6px;">
+            <i class="fa-solid fa-paper-plane" style="font-size: 24px; color: #4B5563; margin-bottom: 8px; display: block;"></i>
+            Belum ada undangan magang yang dikirim. Klik tombol <strong>"Undang Magang"</strong> pada kartu talenta siswa di atas untuk mulai merekrut.
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = invitations.map(inv => {
+        let badge = '';
+        if (inv.status === 'ACCEPTED') {
+          badge = '<span style="background: #065F46; color: #6EE7B7; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;"><i class="fa-solid fa-check"></i> Diterima Siswa</span>';
+        } else if (inv.status === 'REJECTED') {
+          badge = '<span style="background: #374151; color: #9ca3af; padding: 4px 10px; border-radius: 4px; font-size: 11px;"><i class="fa-solid fa-xmark"></i> Ditolak Siswa</span>';
+        } else {
+          badge = '<span style="background: #78350F; color: #FCD34D; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;"><i class="fa-solid fa-clock"></i> Menunggu Respons</span>';
+        }
+
+        const initials = (inv.student_name || 'TS').split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
+
+        return `
+          <div style="background: #18243A; border: 1px solid #26334A; border-radius: 6px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #db2777, #be185d); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; color: #fff;">
+                ${escapeHtml(initials)}
+              </div>
+              <div>
+                <h5 style="margin: 0; color: #fff; font-size: 14px;">${escapeHtml(inv.student_name)} <span style="font-size: 11px; color: #8F9DB4; font-weight: normal;">• ${escapeHtml(inv.student_major || 'SMK CDGS')}</span></h5>
+                <p style="margin: 3px 0 0; color: #F472B6; font-size: 12px; font-weight: 500;"><i class="fa-solid fa-briefcase"></i> Posisi: ${escapeHtml(inv.position)}</p>
+                ${inv.notes ? `<p style="margin: 3px 0 0; color: #9ca3af; font-size: 11px; font-style: italic;">"${escapeHtml(inv.notes)}"</p>` : ''}
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <span style="font-size: 11px; color: #8F9DB4;"><i class="fa-regular fa-clock"></i> ${escapeHtml(inv.created_at_fmt || '')}</span>
+              ${badge}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  } catch (err) {
+    console.error('Error loadInstansiInvitations:', err);
+    listEl.innerHTML = '<div style="color:#ef4444; font-size:12px; padding:10px;">Gagal memuat riwayat undangan.</div>';
+  }
 }
 
 function openAddJobModal() {

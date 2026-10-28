@@ -12,6 +12,8 @@ const schoolRouter = require('./routes/school.router');
 const roleRoutes = require('./modules/identity/role.routes');
 const guruRoutes = require('./modules/academic/guru.routes');
 const portfolioRoutes = require('./modules/portfolio/portfolio.routes');
+const muridRoutes = require('./modules/academic/murid.routes');
+const kepsekRoutes = require('./modules/academic/kepsek.routes');
 
 const app = express();
 
@@ -28,6 +30,8 @@ app.use('/api/v1/schools', schoolRouter);
 app.use('/api/v1/roles', roleRoutes);
 app.use('/api/v1/guru', guruRoutes);
 app.use('/api/v1/portfolios', portfolioRoutes);
+app.use('/api/v1/murid', muridRoutes);
+app.use('/api/v1/kepsek', kepsekRoutes);
 
 app.get('/health', async (req, res) => {
   try {

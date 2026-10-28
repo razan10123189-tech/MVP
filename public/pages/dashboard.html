@@ -236,7 +236,7 @@
           <div class="role-hero-banner hero-kepsek">
             <div class="hero-content">
               <span class="eyebrow" style="color: #93C5FD;"><i class="fa-solid fa-graduation-cap"></i> RUANG EKSEKUTIF KEPALA SEKOLAH</span>
-              <h2>Laporan Capaian & Ekosistem Mutu Sekolah</h2>
+              <h2>Laporan Capaian &amp; Ekosistem Mutu Sekolah</h2>
               <p>Pantau ketercapaian talenta siswa, efektivitas bimbingan guru, kesiapan akreditasi, serta jejaring kemitraan DUDI dan perguruan tinggi secara komprehensif.</p>
             </div>
             <div class="hero-actions">
@@ -244,119 +244,165 @@
             </div>
           </div>
 
-          <!-- 4 Stat Cards Kepala Sekolah -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px;">
+          <!-- 4 Stat Cards Kepala Sekolah (live dari API) -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 24px;">
             <div class="summary-card">
               <p class="summary-label">TOTAL SISWA AKTIF</p>
-              <h3 class="summary-value" style="color: #60A5FA;">428</h3>
-              <p class="summary-caption">3 Jenjang kejuruan/peminatan</p>
+              <h3 id="stat-kepsek-students" class="summary-value" style="color: #60A5FA;">—</h3>
+              <p class="summary-caption">Siswa aktif terdaftar</p>
             </div>
             <div class="summary-card">
               <p class="summary-label">PORTOFOLIO TERVALIDASI</p>
-              <h3 class="summary-value" style="color: #34D399;">312</h3>
-              <p class="summary-caption">Terakreditasi guru pembimbing</p>
+              <h3 id="stat-kepsek-portfolios" class="summary-value" style="color: #34D399;">—</h3>
+              <p class="summary-caption">Diverifikasi guru pembimbing</p>
             </div>
             <div class="summary-card">
-              <p class="summary-label">MITRA DUDI & KAMPUS PTN</p>
-              <h3 id="stat-kepsek-partners" class="summary-value" style="color: #FBBF24;">18</h3>
+              <p class="summary-label">MITRA DUDI &amp; PTN AKTIF</p>
+              <h3 id="stat-kepsek-partners" class="summary-value" style="color: #FBBF24;">—</h3>
               <p class="summary-caption">MoU Kemitraan Aktif</p>
             </div>
             <div class="summary-card">
-              <p class="summary-label">SERAPAN PKL & KESIAPAN</p>
-              <h3 class="summary-value" style="color: #A78BFA;">94.2%</h3>
-              <p class="summary-caption">Siswa memenuhi standar industri</p>
+              <p class="summary-label">SERAPAN PKL</p>
+              <h3 id="stat-kepsek-pkl" class="summary-value" style="color: #A78BFA;">—</h3>
+              <p class="summary-caption" id="stat-kepsek-pkl-caption">Siswa ditempatkan PKL</p>
             </div>
           </div>
 
-          <!-- Visualisasi Distribusi & Kemitraan -->
+          <!-- Distribusi Talenta (Chart) + Ringkasan Bimbingan -->
           <div style="display: grid; grid-template-columns: 1.6fr 1.2fr; gap: 16px; margin-bottom: 24px;">
             <div class="panel">
               <div class="panel-heading">
                 <div>
-                  <h4 style="margin: 0; color: #f3f4f6; font-size: 15px;">Distribusi Talenta Siswa Berdasarkan Bidang</h4>
-                  <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 12px;">Pemetaan keahlian siswa yang telah terverifikasi oleh para pembimbing.</p>
+                  <h4 style="margin: 0; color: #f3f4f6; font-size: 15px;">Distribusi Talenta Siswa per Jurusan</h4>
+                  <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 12px;">Jumlah siswa aktif berdasarkan bidang / jurusan.</p>
                 </div>
               </div>
               <div style="position: relative; height: 210px; width: 100%;">
                 <canvas id="kepsekTalentChart"></canvas>
               </div>
             </div>
-
             <div class="panel">
               <div class="panel-heading">
                 <div>
-                  <h4 style="margin: 0; color: #f3f4f6; font-size: 15px;">Status Kerja Sama Kemitraan</h4>
-                  <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 12px;">Realisasi penyerapan siswa magang / PKL.</p>
+                  <h4 style="margin: 0; color: #f3f4f6; font-size: 15px;">Ringkasan Data Sekolah</h4>
+                  <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 12px;">Rekapitulasi statistik utama sekolah.</p>
                 </div>
               </div>
-              <div style="display: flex; flex-direction: column; gap: 12px;">
-                <div style="background: #18243A; padding: 12px; border-radius: 6px; border-left: 4px solid #3B82F6;">
-                  <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
-                    <span>PT Telkom Indonesia</span>
-                    <span style="color: #60A5FA;">12 Siswa PKL</span>
-                  </div>
-                  <p style="font-size: 11px; color: #9ca3af; margin: 4px 0 0;">Bidang: Software Engineering & Jaringan</p>
+              <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
+                <div style="background:#18243A; padding:12px; border-radius:6px; border-left:4px solid #60A5FA; display:flex; justify-content:space-between; align-items:center;">
+                  <span style="color:#9ca3af;">Total Sesi Bimbingan</span>
+                  <span id="stat-kepsek-guidance" style="font-weight:700; color:#60A5FA; font-size:22px;">—</span>
                 </div>
-                <div style="background: #18243A; padding: 12px; border-radius: 6px; border-left: 4px solid #10B981;">
-                  <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
-                    <span>Studio Animasi Digital Kreatif</span>
-                    <span style="color: #34D399;">8 Siswa PKL</span>
-                  </div>
-                  <p style="font-size: 11px; color: #9ca3af; margin: 4px 0 0;">Bidang: UI/UX & Motion Design</p>
+                <div style="background:#18243A; padding:12px; border-radius:6px; border-left:4px solid #34D399; display:flex; justify-content:space-between; align-items:center;">
+                  <span style="color:#9ca3af;">Total Portofolio</span>
+                  <span id="stat-kepsek-total-porto" style="font-weight:700; color:#34D399; font-size:22px;">—</span>
                 </div>
-                <div style="background: #18243A; padding: 12px; border-radius: 6px; border-left: 4px solid #F59E0B;">
-                  <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
-                    <span>Universitas Indonesia & ITB (PTN)</span>
-                    <span style="color: #FBBF24;">Jalur Prestasi</span>
-                  </div>
-                  <p style="font-size: 11px; color: #9ca3af; margin: 4px 0 0;">15 Portofolio Diajukan Beasiswa</p>
+                <div style="background:#18243A; padding:12px; border-radius:6px; border-left:4px solid #F59E0B; display:flex; justify-content:space-between; align-items:center;">
+                  <span style="color:#9ca3af;">Tingkat Verifikasi</span>
+                  <span id="stat-kepsek-verify-rate" style="font-weight:700; color:#F59E0B; font-size:22px;">—</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Tabel Talenta Unggulan Sekolah -->
-          <div class="panel">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-              <div>
-                <p style="color: #60A5FA; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">HIGHLIGHT PRESTASI</p>
-                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Siswa Berprestasi & Karya Unggulan Sekolah</h4>
-              </div>
+          <!-- Sub-Tab Navigation Kepsek -->
+          <div class="nav-pills" id="kepsek-nav-pills" style="margin-bottom: 20px;">
+            <button class="nav-pill active" id="btn-kepsek-tab-talents" onclick="switchKepsekTab('talents', this)">
+              <i class="fa-solid fa-award"></i> Talenta Unggulan
+            </button>
+            <button class="nav-pill" id="btn-kepsek-tab-mou" onclick="switchKepsekTab('mou', this)">
+              <i class="fa-solid fa-handshake"></i> Daftar MoU
+            </button>
+            <button class="nav-pill" id="btn-kepsek-tab-kpi" onclick="switchKepsekTab('kpi', this)">
+              <i class="fa-solid fa-bullseye"></i> Target KPI
+            </button>
+            <button class="nav-pill" id="btn-kepsek-tab-teachers" onclick="switchKepsekTab('teachers', this)">
+              <i class="fa-solid fa-chalkboard-user"></i> Rekap Guru
+            </button>
+          </div>
+
+          <!-- TAB 1: TALENTA UNGGULAN -->
+          <div id="kepsek-tab-talents" class="kepsek-tab-content panel" style="margin-bottom: 24px;">
+            <div style="margin-bottom: 14px;">
+              <p style="color: #60A5FA; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">HIGHLIGHT PRESTASI</p>
+              <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Siswa Berprestasi &amp; Talenta Unggulan</h4>
             </div>
-            <table style="width: 100%; border-collapse: collapse; color: #f3f4f6; text-align: left; font-size: 13px;">
-              <thead>
-                <tr style="border-bottom: 1px solid #26334A; color: #9ca3af; font-size: 12px;">
-                  <th style="padding: 10px;">Nama Siswa</th>
-                  <th style="padding: 10px;">Kelas / Jurusan</th>
-                  <th style="padding: 10px;">Capaian / Portofolio</th>
-                  <th style="padding: 10px;">Mitra Tertarik</th>
-                  <th style="padding: 10px;">Status Kesiapan</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style="border-bottom: 1px solid #1E293B;">
-                  <td style="padding: 10px; font-weight: 600;">Ahmad Rizqi</td>
-                  <td style="padding: 10px; color: #9ca3af;">XII - RPL 1</td>
-                  <td style="padding: 10px;">Juara 1 LKS Web Technologies 2026</td>
-                  <td style="padding: 10px; color: #93C5FD;">PT Telkom Indonesia</td>
-                  <td style="padding: 10px;"><span class="portfolio-badge-verified">⭐ Siap Kerja</span></td>
-                </tr>
-                <tr style="border-bottom: 1px solid #1E293B;">
-                  <td style="padding: 10px; font-weight: 600;">Siti Nurhaliza</td>
-                  <td style="padding: 10px; color: #9ca3af;">XII - DKV 2</td>
-                  <td style="padding: 10px;">Design System Aplikasi Sekolah Pintar</td>
-                  <td style="padding: 10px; color: #93C5FD;">Studio Animasi Digital</td>
-                  <td style="padding: 10px;"><span class="portfolio-badge-verified">⭐ Siap Kerja</span></td>
-                </tr>
-                <tr style="border-bottom: 1px solid #1E293B;">
-                  <td style="padding: 10px; font-weight: 600;">Budi Prasetyo</td>
-                  <td style="padding: 10px; color: #9ca3af;">XI - TKJ 1</td>
-                  <td style="padding: 10px;">Otomasi Mikrotik Router & VPN Sekolah</td>
-                  <td style="padding: 10px; color: #93C5FD;">PT Solusi Jaringan</td>
-                  <td style="padding: 10px;"><span class="portfolio-badge-verified">⭐ Siap Kerja</span></td>
-                </tr>
-              </tbody>
-            </table>
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; color: #f3f4f6; text-align: left; font-size: 13px;">
+                <thead>
+                  <tr style="border-bottom: 1px solid #26334A; color: #9ca3af; font-size: 12px;">
+                    <th style="padding: 10px;">Nama Siswa</th>
+                    <th style="padding: 10px;">NIS</th>
+                    <th style="padding: 10px;">Kelas / Jurusan</th>
+                    <th style="padding: 10px;">Porto. Terverifikasi</th>
+                    <th style="padding: 10px;">Mitra PKL</th>
+                    <th style="padding: 10px;">Kesiapan</th>
+                  </tr>
+                </thead>
+                <tbody id="kepsek-talents-tbody">
+                  <tr><td colspan="6" style="text-align:center; padding: 20px; color: #9ca3af;">Memuat data talenta...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TAB 2: DAFTAR MoU KEMITRAAN -->
+          <div id="kepsek-tab-mou" class="kepsek-tab-content panel" style="display: none; margin-bottom: 24px;">
+            <div style="margin-bottom: 14px;">
+              <p style="color: #FBBF24; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">MANAJEMEN KEMITRAAN</p>
+              <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Daftar MoU DUDI &amp; Perguruan Tinggi</h4>
+            </div>
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; color: #f3f4f6; text-align: left; font-size: 13px;">
+                <thead>
+                  <tr style="border-bottom: 1px solid #26334A; color: #9ca3af; font-size: 12px;">
+                    <th style="padding: 10px;">Nama Mitra</th>
+                    <th style="padding: 10px;">Kategori</th>
+                    <th style="padding: 10px;">No. MoU</th>
+                    <th style="padding: 10px;">Masa Berlaku</th>
+                    <th style="padding: 10px;">Status</th>
+                    <th style="padding: 10px;">Kontak</th>
+                  </tr>
+                </thead>
+                <tbody id="kepsek-mou-tbody">
+                  <tr><td colspan="6" style="text-align:center; padding: 20px; color: #9ca3af;">Memuat data MoU...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TAB 3: TARGET KPI SEKOLAH -->
+          <div id="kepsek-tab-kpi" class="kepsek-tab-content panel" style="display: none; margin-bottom: 24px;">
+            <div style="margin-bottom: 14px;">
+              <p style="color: #A78BFA; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">INDIKATOR MUTU SEKOLAH</p>
+              <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Target KPI &amp; Realisasi</h4>
+            </div>
+            <div id="kepsek-kpi-list" style="display: flex; flex-direction: column; gap: 14px;">
+              <p style="color: #9ca3af; font-size: 13px; text-align: center; padding: 20px;">Memuat data KPI...</p>
+            </div>
+          </div>
+
+          <!-- TAB 4: REKAP GURU PEMBIMBING -->
+          <div id="kepsek-tab-teachers" class="kepsek-tab-content panel" style="display: none; margin-bottom: 24px;">
+            <div style="margin-bottom: 14px;">
+              <p style="color: #34D399; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">KINERJA PENDIDIK</p>
+              <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Rekap Aktivitas Guru Pembimbing</h4>
+            </div>
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; color: #f3f4f6; text-align: left; font-size: 13px;">
+                <thead>
+                  <tr style="border-bottom: 1px solid #26334A; color: #9ca3af; font-size: 12px;">
+                    <th style="padding: 10px;">Nama Guru</th>
+                    <th style="padding: 10px;">Total Sesi Bimbingan</th>
+                    <th style="padding: 10px;">Siswa Dibimbing</th>
+                    <th style="padding: 10px;">Terakhir Aktif</th>
+                  </tr>
+                </thead>
+                <tbody id="kepsek-teachers-tbody">
+                  <tr><td colspan="4" style="text-align:center; padding: 20px; color: #9ca3af;">Memuat data guru...</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
 
@@ -546,158 +592,220 @@
           <div class="role-hero-banner hero-murid">
             <div class="hero-content">
               <span class="eyebrow" style="color: #FCD34D;"><i class="fa-solid fa-user-astronaut"></i> RUANG TALENTA SISWA</span>
-              <h2>Portofolio & Rekam Jejak Kompetensi</h2>
-              <p>Tampilkan karya terbaikmu kepada industri dan perguruan tinggi. Dapatkan verifikasi dari guru pembimbing untuk membuka peluang magang impian.</p>
+              <h2>Portofolio & Rekam Jejak Kompetensi Vokasi</h2>
+              <p>Kelola portofolio karyamu, pantau validasi dan lencana keahlian dari guru pembimbing, evaluasi kemajuan PKL industri, serta lamar kuota magang mitra DUDI.</p>
             </div>
-            <div class="hero-actions">
+            <div class="hero-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
               <button onclick="openAddPortfolioModal()" class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 13px; background: #d97706;"><i class="fa-solid fa-plus"></i> Unggah Portofolio Baru</button>
+              <button onclick="openMuridResumeModal()" class="btn-secondary" style="width: auto; padding: 8px 16px; font-size: 13px; background: #1E293B; border-color: #38BDF8; color: #38BDF8;"><i class="fa-solid fa-file-invoice"></i> Cetak CV / Resume Digital</button>
             </div>
           </div>
 
           <!-- Profil Siswa Card & 4 Stat Cards -->
           <div style="display: grid; grid-template-columns: 1.2fr 2fr; gap: 16px; margin-bottom: 24px;">
-            <!-- Profil Card -->
-            <div class="panel" style="display: flex; flex-direction: column; justify-content: center;">
-              <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
-                <div class="talent-avatar" style="width: 56px; height: 56px; font-size: 1.4rem; background: linear-gradient(135deg, #F59E0B, #D97706);">
-                  MR
+            <!-- Profil Card Siswa -->
+            <div class="panel" style="display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                  <div style="display: flex; align-items: center; gap: 14px;">
+                    <div id="murid-avatar-circle" class="talent-avatar" style="width: 56px; height: 56px; font-size: 1.4rem; background: linear-gradient(135deg, #F59E0B, #D97706);">
+                      MR
+                    </div>
+                    <div>
+                      <h3 id="murid-profile-name" style="margin: 0; color: #f3f4f6; font-size: 16px;">Muhammad Razan</h3>
+                      <p id="murid-profile-meta" style="margin: 2px 0 0; color: #9ca3af; font-size: 12px;">NISN: 0068492011 • XII RPL 1 • Rekayasa Perangkat Lunak</p>
+                      <div id="murid-profile-badge-box" style="margin-top: 6px;">
+                        <span id="murid-profile-status" class="role-badge badge-murid">⭐ Direkomendasikan Guru ke Industri</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button onclick="openEditStudentProfileModal()" class="btn-secondary" style="width: auto; padding: 4px 10px; font-size: 11px; border-color: #374151;" title="Edit Profil"><i class="fa-solid fa-user-pen"></i></button>
                 </div>
-                <div>
-                  <h3 id="murid-profile-name" style="margin: 0; color: #f3f4f6; font-size: 16px;">Muhammad Razan</h3>
-                  <p style="margin: 2px 0 0; color: #9ca3af; font-size: 12px;">NISN: 0068492011 • Rekayasa Perangkat Lunak</p>
-                  <span class="role-badge badge-murid" style="margin-top: 6px;">⭐ Siap Disalurkan ke Industri</span>
+
+                <div style="font-size: 12px; color: #8F9DB4; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-chalkboard-user" style="color: #60A5FA;"></i>
+                  <span>Pembimbing: <strong id="murid-mentor-name" style="color: #F3F5FA;">Bpk. Budi Santoso</strong></span>
                 </div>
               </div>
+
               <div style="border-top: 1px solid #26334A; padding-top: 10px;">
-                <p style="font-size: 11px; color: #9ca3af; margin: 0 0 6px 0;">BADGES KEAHLIAN TERVALIDASI:</p>
-                <div class="skill-tags" style="margin: 0;">
+                <p style="font-size: 11px; color: #9ca3af; margin: 0 0 6px 0; font-weight: 600;">KEAHLIAN & TECH STACK SAYA:</p>
+                <div id="murid-profile-skills-tags" class="skill-tags" style="margin: 0;">
                   <span class="skill-tag skill-tag-highlight">JavaScript</span>
                   <span class="skill-tag skill-tag-highlight">Node.js</span>
                   <span class="skill-tag">PostgreSQL</span>
-                  <span class="skill-tag">REST API</span>
-                  <span class="skill-tag">Git</span>
                 </div>
               </div>
             </div>
 
             <!-- 4 Quick Stats Murid -->
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+              <div class="summary-card" style="cursor: pointer;" onclick="switchMuridTab('portfolios')">
+                <p class="summary-label">TOTAL PORTOFOLIO</p>
+                <h3 id="stat-murid-total" class="summary-value" style="color: #FBBF24;">2</h3>
+                <p id="stat-murid-portfolio-sub" class="summary-caption">1 Disetujui • 1 Menunggu</p>
+              </div>
               <div class="summary-card">
                 <p class="summary-label">SKOR KESIAPAN TALENTA</p>
-                <h3 class="summary-value" style="color: #FBBF24;">92 <small style="font-size: 12px; color: #8F9DB4;">/ 100</small></h3>
-                <p class="summary-caption">Peringkat 5% Teratas Jurusan</p>
+                <h3 id="stat-murid-readiness" class="summary-value" style="color: #34D399;">81 <small style="font-size: 12px; color: #8F9DB4;">/ 100</small></h3>
+                <p id="stat-murid-readiness-sub" class="summary-caption">Siap Diserap Dunia Industri</p>
               </div>
-              <div class="summary-card">
-                <p class="summary-label">KARYA TERVALIDASI</p>
-                <h3 id="stat-murid-verified-count" class="summary-value" style="color: #34D399;">4</h3>
-                <p class="summary-caption">Disetujui guru pembimbing</p>
-              </div>
-              <div class="summary-card">
+              <div class="summary-card" style="cursor: pointer;" onclick="switchMuridTab('badges')">
                 <p class="summary-label">LENCANA KOMPETENSI</p>
-                <h3 class="summary-value" style="color: #60A5FA;">6 Badges</h3>
-                <p class="summary-caption">Kemampuan teruji</p>
+                <h3 id="stat-murid-badges" class="summary-value" style="color: #60A5FA;">1 Badge</h3>
+                <p class="summary-caption">Terverifikasi Guru Pembimbing</p>
               </div>
-              <div class="summary-card">
-                <p class="summary-label">PELUANG MAGANG TERBUKA</p>
-                <h3 class="summary-value" style="color: #F472B6;">8 Mitra</h3>
-                <p class="summary-caption">Sesuai skill profil kamu</p>
+              <div class="summary-card" style="cursor: pointer;" onclick="switchMuridTab('vacancies')">
+                <p class="summary-label">PELUANG MAGANG DUDI</p>
+                <h3 id="stat-murid-vacancies" class="summary-value" style="color: #F472B6;">5 Posisi</h3>
+                <p class="summary-caption">Membuka Kuota Magang Siswa</p>
               </div>
             </div>
           </div>
 
-          <!-- Galeri Portofolio Proyek Saya -->
-          <div class="panel" style="margin-bottom: 24px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <!-- Sub-Tab Navigation Murid -->
+          <div class="nav-pills" id="murid-nav-pills" style="margin-bottom: 20px;">
+            <button class="nav-pill active" id="btn-murid-tab-portfolios" onclick="switchMuridTab('portfolios', this)">
+              <i class="fa-solid fa-folder-open"></i> Galeri Portofolio Proyek 
+              <span id="murid-portfolios-tab-badge" class="portfolio-badge-pending" style="font-size: 10px; padding: 1px 6px; margin-left: 6px;">2</span>
+            </button>
+            <button class="nav-pill" id="btn-murid-tab-badges" onclick="switchMuridTab('badges', this)">
+              <i class="fa-solid fa-certificate"></i> Lencana & Skor Kompetensi
+              <span id="murid-badges-tab-badge" class="portfolio-badge-verified" style="font-size: 10px; padding: 1px 6px; margin-left: 6px;">1</span>
+            </button>
+            <button class="nav-pill" id="btn-murid-tab-pkl" onclick="switchMuridTab('pkl', this)">
+              <i class="fa-solid fa-briefcase"></i> Status PKL & Jurnal Bimbingan
+            </button>
+            <button class="nav-pill" id="btn-murid-tab-vacancies" onclick="switchMuridTab('vacancies', this)">
+              <i class="fa-solid fa-bullhorn"></i> Peluang Magang Mitra DUDI
+              <span id="murid-vacancies-tab-badge" style="background:#db2777; color:#fff; font-size:10px; padding:1px 6px; border-radius:10px; margin-left:6px;">5</span>
+            </button>
+            <button class="nav-pill" id="btn-murid-tab-invitations" onclick="switchMuridTab('invitations', this)">
+              <i class="fa-solid fa-envelope-open-text"></i> Undangan Magang Masuk
+              <span id="murid-invitations-tab-badge" style="background:#db2777; color:#fff; font-size:10px; padding:1px 6px; border-radius:10px; margin-left:6px;">0</span>
+            </button>
+          </div>
+
+          <!-- TAB 1: PORTOFOLIO PROYEK SAYA -->
+          <div id="murid-tab-portfolios" class="murid-tab-content panel" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
               <div>
-                <p style="color: #F59E0B; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">KARYA & PROYEK</p>
-                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Galeri Portofolio Saya</h4>
+                <p style="color: #F59E0B; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">KARYA & REKAM KOMPETENSI</p>
+                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Daftar Portofolio Proyek</h4>
               </div>
-              <button onclick="openAddPortfolioModal()" class="btn-primary" style="width: auto; padding: 6px 14px; font-size: 12px; background: #d97706;"><i class="fa-solid fa-plus"></i> Tambah Proyek</button>
+
+              <!-- Filter & Actions -->
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <input type="text" id="murid-portfolio-search" placeholder="Cari karya / skill..." oninput="filterMuridPortfolios()" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #374151; background: #1f2937; color: #fff; width: 180px;">
+                <select id="murid-portfolio-status-filter" onchange="filterMuridPortfolios()" style="padding: 6px 10px; font-size: 12px; border-radius: 6px; border: 1px solid #374151; background: #1f2937; color: #fff;">
+                  <option value="ALL">Semua Status</option>
+                  <option value="APPROVED">✅ Terverifikasi Guru</option>
+                  <option value="PENDING">⏳ Menunggu Guru</option>
+                  <option value="REVISION">⚠️ Butuh Revisi</option>
+                </select>
+                <button onclick="openAddPortfolioModal()" class="btn-primary" style="width: auto; padding: 6px 14px; font-size: 12px; background: #d97706;"><i class="fa-solid fa-plus"></i> Tambah Proyek</button>
+              </div>
             </div>
 
+            <!-- Grid Portofolio Dinamis -->
             <div class="portfolio-grid" id="murid-portfolio-grid">
-              <!-- Proyek 1 -->
-              <div class="portfolio-card">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                  <span class="portfolio-badge-verified"><i class="fa-solid fa-circle-check"></i> Terverifikasi</span>
-                  <span style="font-size: 11px; color: #8F9DB4;">Web App</span>
+              <div style="text-align: center; padding: 40px; color: #9ca3af; grid-column: 1 / -1;">
+                <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 24px; margin-bottom: 10px; color: #F59E0B;"></i>
+                <p style="margin: 0;">Memuat portofolio proyek kamu...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: LENCANA KEAHLIAN & SKOR KOMPETENSI -->
+          <div id="murid-tab-badges" class="murid-tab-content panel" style="display: none; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+              <div>
+                <p style="color: #60A5FA; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">KOMPETENSI TERUJI OLEH GURU</p>
+                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Lencana Keahlian (Verified Badges)</h4>
+              </div>
+              <div style="font-size: 12px; color: #9ca3af;">
+                Diperoleh melalui verifikasi karya portofolio dengan nilai standar industri (&ge; 85)
+              </div>
+            </div>
+
+            <div id="murid-badges-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+              <div style="text-align: center; padding: 40px; color: #9ca3af; grid-column: 1 / -1;">
+                <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 24px; margin-bottom: 10px; color: #60A5FA;"></i>
+                <p style="margin: 0;">Memuat lencana kompetensi kamu...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 3: STATUS PKL & JURNAL BIMBINGAN -->
+          <div id="murid-tab-pkl" class="murid-tab-content" style="display: none; margin-bottom: 24px;">
+            <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 16px;">
+              <!-- Panel Kiri: Status PKL -->
+              <div class="panel" id="murid-pkl-card-container">
+                <div style="margin-bottom: 14px;">
+                  <p style="color: #34D399; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">PRAKTIK KERJA LAPANGAN (PKL)</p>
+                  <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Status Penempatan Industri</h4>
                 </div>
-                <h4 style="margin: 0 0 6px 0; color: #F3F5FA; font-size: 15px;">Sistem Manajemen Perpustakaan Sekolah</h4>
-                <p style="margin: 0 0 10px 0; color: #8F9DB4; font-size: 12px; line-height: 1.4;">Aplikasi web peminjaman buku berbasis QR Code dengan katalog digital real-time.</p>
-                <div class="skill-tags">
-                  <span class="skill-tag">Node.js</span>
-                  <span class="skill-tag">PostgreSQL</span>
-                  <span class="skill-tag">Express</span>
-                </div>
-                <div style="margin-top: auto; border-top: 1px solid #26334A; padding-top: 8px; display: flex; justify-content: space-between; font-size: 11px; color: #6EE7B7;">
-                  <span>Pembimbing: Bpk. Budi Santoso</span>
-                  <a href="#" style="color: #60A5FA; text-decoration: none;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Demo</a>
+                <div id="murid-pkl-details">
+                  <div style="text-align: center; padding: 30px; color: #9ca3af;">
+                    <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 20px; margin-bottom: 8px;"></i>
+                    <p style="margin: 0;">Memuat data penempatan PKL...</p>
+                  </div>
                 </div>
               </div>
 
-              <!-- Proyek 2 -->
-              <div class="portfolio-card">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                  <span class="portfolio-badge-verified"><i class="fa-solid fa-circle-check"></i> Terverifikasi</span>
-                  <span style="font-size: 11px; color: #8F9DB4;">UI/UX</span>
+              <!-- Panel Kanan: Jurnal Bimbingan -->
+              <div class="panel">
+                <div style="margin-bottom: 14px;">
+                  <p style="color: #F472B6; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">PENDAMPINGAN GURU</p>
+                  <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Jurnal & Catatan Bimbingan</h4>
                 </div>
-                <h4 style="margin: 0 0 6px 0; color: #F3F5FA; font-size: 15px;">Redesain Portal Magang Siswa SMK</h4>
-                <p style="margin: 0 0 10px 0; color: #8F9DB4; font-size: 12px; line-height: 1.4;">Desain antarmuka mobile-first untuk memudahkan siswa mencari dan melamar posisi PKL di industri.</p>
-                <div class="skill-tags">
-                  <span class="skill-tag">Figma</span>
-                  <span class="skill-tag">Prototyping</span>
-                </div>
-                <div style="margin-top: auto; border-top: 1px solid #26334A; padding-top: 8px; display: flex; justify-content: space-between; font-size: 11px; color: #6EE7B7;">
-                  <span>Pembimbing: Ibu Ratna Dewi</span>
-                  <a href="#" style="color: #60A5FA; text-decoration: none;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Figma</a>
-                </div>
-              </div>
-
-              <!-- Proyek 3 -->
-              <div class="portfolio-card">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                  <span class="portfolio-badge-pending"><i class="fa-solid fa-clock"></i> Menunggu Guru</span>
-                  <span style="font-size: 11px; color: #8F9DB4;">Fullstack</span>
-                </div>
-                <h4 style="margin: 0 0 6px 0; color: #F3F5FA; font-size: 15px;">Aplikasi Fullstack Web POS CDGS</h4>
-                <p style="margin: 0 0 10px 0; color: #8F9DB4; font-size: 12px; line-height: 1.4;">Aplikasi kasir multi-tenant modern dengan laporan penjualan otomatis dan cetak struk.</p>
-                <div class="skill-tags">
-                  <span class="skill-tag">JavaScript</span>
-                  <span class="skill-tag">PostgreSQL</span>
-                </div>
-                <div style="margin-top: auto; border-top: 1px solid #26334A; padding-top: 8px; display: flex; justify-content: space-between; font-size: 11px; color: #FCD34D;">
-                  <span>Status: Dalam antrean guru</span>
-                  <a href="#" style="color: #60A5FA; text-decoration: none;"><i class="fa-solid fa-code"></i> Repo</a>
+                <div id="murid-guidance-list" style="max-height: 480px; overflow-y: auto;">
+                  <div style="text-align: center; padding: 30px; color: #9ca3af;">
+                    <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 20px; margin-bottom: 8px;"></i>
+                    <p style="margin: 0;">Memuat riwayat bimbingan...</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Rekomendasi Magang DUDI Cocok -->
-          <div class="panel">
-            <div style="margin-bottom: 12px;">
-              <p style="color: #F59E0B; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">PELUANG UNTUKMU</p>
-              <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Rekomendasi Magang Industri (DUDI) yang Membuka Kuota</h4>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
-              <div style="background: #18243A; padding: 14px; border-radius: 8px; border: 1px solid #26334A;">
-                <div style="display: flex; justify-content: space-between; align-items: start;">
-                  <h5 style="margin: 0; color: #fff; font-size: 14px;">Junior Web Developer Intern</h5>
-                  <span class="role-badge badge-guru">Kuota: 3</span>
-                </div>
-                <p style="color: #60A5FA; font-size: 12px; margin: 3px 0 8px;">PT Telkom Indonesia</p>
-                <p style="color: #8F9DB4; font-size: 11px; margin-bottom: 10px;">Kualifikasi: Menguasai HTML/CSS, JavaScript modern, dan dasar database SQL.</p>
-                <button onclick="alert('Minat magang kamu berhasil dikirimkan ke PT Telkom Indonesia!')" class="btn-primary" style="padding: 5px 12px; font-size: 12px; width: auto; background: #2563eb;">Ajukan Minat Magang</button>
+          <!-- TAB 4: LOWONGAN MAGANG MITRA DUDI -->
+          <div id="murid-tab-vacancies" class="murid-tab-content panel" style="display: none; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+              <div>
+                <p style="color: #F472B6; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">PELUANG KARIR & MAGANG</p>
+                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;">Lowongan Magang Industri (DUDI)</h4>
               </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <input type="text" id="murid-vacancy-search" placeholder="Cari posisi / mitra industri..." oninput="filterMuridVacancies()" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #374151; background: #1f2937; color: #fff; width: 220px;">
+                <button onclick="loadMuridVacancies()" class="btn-secondary" style="width: auto; padding: 6px 10px; font-size: 12px;" title="Muat Ulang"><i class="fa-solid fa-rotate-right"></i></button>
+              </div>
+            </div>
 
-              <div style="background: #18243A; padding: 14px; border-radius: 8px; border: 1px solid #26334A;">
-                <div style="display: flex; justify-content: space-between; align-items: start;">
-                  <h5 style="margin: 0; color: #fff; font-size: 14px;">UI/UX Design Apprentice</h5>
-                  <span class="role-badge badge-guru">Kuota: 2</span>
-                </div>
-                <p style="color: #60A5FA; font-size: 12px; margin: 3px 0 8px;">Studio Animasi Digital Kreatif</p>
-                <p style="color: #8F9DB4; font-size: 11px; margin-bottom: 10px;">Kualifikasi: Mampu membuat wireframe & clickable prototype di Figma.</p>
-                <button onclick="alert('Minat magang kamu berhasil dikirimkan ke Studio Animasi Digital!')" class="btn-primary" style="padding: 5px 12px; font-size: 12px; width: auto; background: #2563eb;">Ajukan Minat Magang</button>
+            <!-- Grid Lowongan Magang -->
+            <div id="murid-vacancies-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
+              <div style="text-align: center; padding: 40px; color: #9ca3af; grid-column: 1 / -1;">
+                <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 24px; margin-bottom: 10px; color: #F472B6;"></i>
+                <p style="margin: 0;">Memuat lowongan magang mitra industri...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 5: UNDANGAN MAGANG MASUK DARI MITRA DUDI -->
+          <div id="murid-tab-invitations" class="murid-tab-content panel" style="display: none; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+              <div>
+                <p style="color: #F472B6; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">TAWARAN MASUK INDUSTRI</p>
+                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;"><i class="fa-solid fa-envelope-open-text"></i> Undangan Wawancara & Magang dari Mitra DUDI</h4>
+                <p style="margin: 3px 0 0; color: #9ca3af; font-size: 12px;">Mitra industri mengundang Anda berdasarkan kecocokan portofolio keahlian yang telah divalidasi guru.</p>
+              </div>
+              <button onclick="loadMuridInvitations()" class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px;" title="Muat Ulang"><i class="fa-solid fa-rotate-right"></i> Perbarui</button>
+            </div>
+            
+            <div id="murid-invitations-list" style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="text-align: center; padding: 30px; color: #8F9DB4;">
+                <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 20px; margin-bottom: 8px;"></i>
+                <p style="margin: 0;">Memuat undangan magang masuk...</p>
               </div>
             </div>
           </div>
@@ -861,6 +969,23 @@
               <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid #26334A; display: flex; gap: 8px;">
                 <button onclick="inviteTalent('Ahmad Rizqi', 'RPL')" class="btn-primary" style="font-size: 12px; padding: 6px 12px; background: #db2777;"><i class="fa-solid fa-paper-plane"></i> Undang Magang</button>
                 <button onclick="alert('Portofolio Ahmad Rizqi: Proyek Juara 1 LKS Web Tech & Smart Dashboard')" class="btn-secondary" style="font-size: 12px; padding: 6px 10px; color: #fff; border-color: #384C6E;">Lihat Portofolio</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel Riwayat Undangan Magang Terkirim (Pipeline DUDI) -->
+          <div class="panel" style="margin-top: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <p style="color: #F472B6; font-size: 11px; font-weight: 700; margin: 0 0 2px 0;">PIPELINE REKRUTMEN INDUSTRI</p>
+                <h4 style="margin: 0; color: #f3f4f6; font-size: 16px;"><i class="fa-solid fa-paper-plane"></i> Riwayat Undangan Magang yang Telah Dikirim</h4>
+                <p style="margin: 2px 0 0; color: #9ca3af; font-size: 12px;">Pantau respons siswa terhadap undangan wawancara & magang yang telah Anda kirimkan.</p>
+              </div>
+              <button onclick="loadInstansiInvitations()" class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px;" title="Muat Ulang"><i class="fa-solid fa-rotate-right"></i> Segarkan Data</button>
+            </div>
+            <div id="instansi-invitations-list" style="display: flex; flex-direction: column; gap: 10px;">
+              <div style="text-align: center; padding: 24px; color: #8F9DB4; font-size: 13px;">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Memuat daftar undangan...
               </div>
             </div>
           </div>
@@ -1437,14 +1562,182 @@
       <div class="modal-foot">
         <button type="button" onclick="closeGuruReportModal()" class="btn-secondary" style="width:auto; padding:6px 14px;">Tutup</button>
         <button type="button" onclick="window.print()" class="btn-primary" style="width:auto; padding:6px 18px; background:#059669;"><i class="fa-solid fa-print"></i> Cetak / Simpan PDF</button>
+  <!-- ================================================================= -->
+  <!-- MODALS FOR MURID / TALENTA SISWA                                 -->
+  <!-- ================================================================= -->
+
+  <!-- M1. Modal Edit Profil Siswa & Keahlian -->
+  <div id="modalEditStudentProfile" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog" style="max-width: 520px;">
+      <div class="modal-head" style="border-bottom-color: #d97706;">
+        <h3 style="color: #FCD34D;"><i class="fa-solid fa-user-pen"></i> Perbarui Profil & Keahlian Siswa</h3>
+        <button type="button" class="modal-close-btn" onclick="closeEditStudentProfileModal()">&times;</button>
+      </div>
+      <form onsubmit="handleUpdateStudentProfile(event)">
+        <div class="modal-body">
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Nama Lengkap Siswa *</label>
+            <input type="text" id="edit-student-name" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 12px;">
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">NISN *</label>
+              <input type="text" id="edit-student-nisn" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Kelas *</label>
+              <input type="text" id="edit-student-class" required placeholder="Contoh: XII RPL 1" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+            </div>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Kompetensi Keahlian (Jurusan) *</label>
+            <input type="text" id="edit-student-major" required placeholder="Contoh: Rekayasa Perangkat Lunak" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Keahlian Utama / Tech Stack (Pisahkan dengan koma) *</label>
+            <input type="text" id="edit-student-skills" required placeholder="Contoh: JavaScript, Node.js, Express, PostgreSQL, UI/UX" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+            <small style="color:#9ca3af; font-size:11px;">Skill ini akan terlihat oleh mitra industri dan guru pembimbing.</small>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" onclick="closeEditStudentProfileModal()" class="btn-secondary" style="width:auto; padding:6px 14px;">Batal</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:6px 16px; background:#d97706;">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- M2. Modal Edit / Revisi Portofolio Siswa -->
+  <div id="modalEditPortfolio" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog" style="max-width: 580px;">
+      <div class="modal-head" style="border-bottom-color: #3b82f6;">
+        <h3 style="color: #60A5FA;"><i class="fa-solid fa-pen-to-square"></i> Edit Portofolio Proyek</h3>
+        <button type="button" class="modal-close-btn" onclick="closeEditPortfolioModal()">&times;</button>
+      </div>
+      <form onsubmit="handleUpdatePortfolio(event)">
+        <input type="hidden" id="edit-portfolio-id">
+        <div class="modal-body">
+          <div id="edit-portfolio-revision-notice" style="display:none; background:#7f1d1d; border:1px solid #ef4444; border-radius:6px; padding:10px 14px; margin-bottom:14px; font-size:12px; color:#fecaca;">
+            <strong style="color:#fff;"><i class="fa-solid fa-triangle-exclamation"></i> Catatan Revisi dari Guru:</strong>
+            <p id="edit-portfolio-revision-text" style="margin:4px 0 0;"></p>
+            <p style="margin:4px 0 0; font-size:11px; color:#fed7aa;">Simpan perubahan akan otomatis mengembalikan portofolio ke antrean review guru (Menunggu Review).</p>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Judul Karya / Proyek *</label>
+            <input type="text" id="edit-portfolio-title" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 12px;">
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Kategori *</label>
+              <select id="edit-portfolio-category" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+                <option value="Web App">Web Application</option>
+                <option value="Mobile App">Mobile Application</option>
+                <option value="UI/UX Design">UI/UX Design</option>
+                <option value="Jaringan & Server">Jaringan & Server</option>
+                <option value="IoT & Hardware">IoT & Hardware</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Link Demo / GitHub</label>
+              <input type="text" id="edit-portfolio-link" placeholder="https://..." style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+            </div>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Keahlian / Tech Stack Digunakan *</label>
+            <input type="text" id="edit-portfolio-skills" required placeholder="Contoh: Node.js, Express, PostgreSQL" style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;">
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Deskripsi Karya *</label>
+            <textarea id="edit-portfolio-desc" rows="3" required placeholder="Jelaskan fitur, arsitektur, dan solusi..." style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;"></textarea>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" onclick="closeEditPortfolioModal()" class="btn-secondary" style="width:auto; padding:6px 14px;">Batal</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:6px 16px; background:#2563eb;">Simpan & Ajukan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- M3. Modal Detail Portofolio Siswa -->
+  <div id="modalMuridDetailPortfolio" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog" style="max-width: 600px;">
+      <div class="modal-head">
+        <h3 id="detail-portfolio-title-head"><i class="fa-solid fa-layer-group"></i> Detail Portofolio</h3>
+        <button type="button" class="modal-close-btn" onclick="closeMuridDetailPortfolioModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="detail-portfolio-body" style="font-size: 13px; color: #fff;">
+        <!-- Dynamic content filled by JS -->
+      </div>
+      <div class="modal-foot">
+        <button type="button" onclick="closeMuridDetailPortfolioModal()" class="btn-secondary" style="width:auto; padding:6px 14px;">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- M4. Modal Lamar Lowongan Magang DUDI -->
+  <div id="modalApplyVacancy" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog" style="max-width: 540px;">
+      <div class="modal-head" style="border-bottom-color: #db2777;">
+        <h3 style="color: #F472B6;"><i class="fa-solid fa-paper-plane"></i> Lamar Posisi Magang Industri</h3>
+        <button type="button" class="modal-close-btn" onclick="closeApplyVacancyModal()">&times;</button>
+      </div>
+      <form onsubmit="handleApplyVacancy(event)">
+        <input type="hidden" id="apply-vacancy-id">
+        <div class="modal-body">
+          <div style="background: #18243A; border: 1px solid #26334A; border-radius: 6px; padding: 12px; margin-bottom: 14px;">
+            <h4 id="apply-vacancy-title" style="margin: 0 0 4px 0; color: #fff; font-size: 15px;">Junior Web Developer Intern</h4>
+            <p id="apply-vacancy-partner" style="margin: 0; color: #60A5FA; font-size: 12px;">PT Telkom Indonesia • Divisi Digital Service</p>
+            <div style="display: flex; gap: 12px; margin-top: 8px; font-size: 11px; color: #8F9DB4;">
+              <span id="apply-vacancy-quota"><i class="fa-solid fa-users"></i> Kuota: 3 Siswa</span>
+              <span id="apply-vacancy-location"><i class="fa-solid fa-location-dot"></i> Bandung, Jawa Barat</span>
+            </div>
+            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #26334A; font-size: 12px; color: #9ca3af;">
+              <strong>Kualifikasi:</strong>
+              <p id="apply-vacancy-reqs" style="margin: 3px 0 0; color: #cbd5e1;"></p>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display:block; font-size:12px; margin-bottom:4px; color:#9ca3af;">Catatan Pengajuan / Motivasi Singkat *</label>
+            <textarea id="apply-notes" rows="3" required placeholder="Ceritakan ketertarikan kamu, proyek portofolio unggulanmu, dan kesiapan berkontribusi di industri ini..." style="width:100%; padding:8px; border-radius:4px; border:1px solid #4b5563; background:#374151; color:#fff;"></textarea>
+          </div>
+
+          <div style="font-size: 11px; color: #8F9DB4; background: #0D1525; padding: 10px; border-radius: 4px; border-left: 3px solid #60A5FA;">
+            <i class="fa-solid fa-circle-info" style="color: #60A5FA;"></i> Profil talenta dan portofolio kamu yang telah disetujui guru pembimbing akan otomatis disertakan ke pihak industri mitra.
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" onclick="closeApplyVacancyModal()" class="btn-secondary" style="width:auto; padding:6px 14px;">Batal</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:6px 16px; background:#db2777;">Kirim Lamaran Magang</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- M5. Modal Cetak CV / Resume Portofolio Digital Siswa (Print-Ready) -->
+  <div id="modalMuridResume" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog" style="max-width: 820px;">
+      <div class="modal-head" style="border-bottom-color: #38BDF8;">
+        <h3 style="color: #38BDF8;"><i class="fa-solid fa-file-invoice"></i> Digital Talent Resume & Portfolio Vokasi</h3>
+        <button type="button" class="modal-close-btn" onclick="closeMuridResumeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="murid-resume-printable-area" style="background: #0B1120; border-radius: 6px; padding: 24px; color: #fff; max-height: 75vh; overflow-y: auto;">
+        <!-- Dynamic populated print-ready CV -->
+      </div>
+      <div class="modal-foot">
+        <button type="button" onclick="closeMuridResumeModal()" class="btn-secondary" style="width:auto; padding:6px 14px;">Tutup</button>
+        <button type="button" onclick="window.print()" class="btn-primary" style="width:auto; padding:6px 18px; background:#0284c7;"><i class="fa-solid fa-print"></i> Cetak / Simpan PDF</button>
       </div>
     </div>
   </div>
 
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="/js/api.js"></script>
-  <script src="/js/auth.js"></script>
-  <script src="/js/dashboard.js"></script>
+  <script src="/js/api.js?v=2.1"></script>
+  <script src="/js/auth.js?v=2.1"></script>
+  <script src="/js/dashboard.js?v=2.1"></script>
 </body>
 </html>

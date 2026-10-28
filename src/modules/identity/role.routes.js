@@ -17,20 +17,20 @@ const {
 const verifyToken = require('../../middlewares/auth.middleware');
 const authorizeRoles = require('../../middlewares/role.middleware');
 
-// ==========================================
+
 // RUTE ASSIGN / REMOVE ROLE (harus sebelum /:id agar tidak bentrok)
-// ==========================================
+
 router.post('/assign', verifyToken, authorizeRoles('Platform Admin', 'Kepala Sekolah'), assignRoleToUser);
 router.post('/remove', verifyToken, authorizeRoles('Platform Admin', 'Kepala Sekolah'), removeRoleFromUser);
 
-// ==========================================
+
 // RUTE LIHAT ROLES MILIK USER TERTENTU
-// ==========================================
+
 router.get('/user/:userId', verifyToken, getUserRoles);
 
-// ==========================================
+
 // RUTE CRUD ROLES
-// ==========================================
+
 router.get('/', verifyToken, getAllRoles);
 router.post('/', verifyToken, authorizeRoles('Platform Admin', 'Kepala Sekolah'), createRole);
 router.get('/:id', verifyToken, getRoleById);
